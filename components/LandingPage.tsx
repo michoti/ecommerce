@@ -14,29 +14,27 @@ import { productData } from "@/lib/data";
 export default function LandingPage() {
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="scroll-smooth">
+    <>
         <HeroSection />
         <ProductSection
           title="OUR FEATURED COLLECTION"
           description="Explore our handpicked selection of bestselling products loved by makeup artists and beauty enthusiasts worldwide"
-          products={productData.featured}
+          products={productData.productReferences.featured}
         />
-        {/* <ProductSection
+        <ProductSection
           title="BEST SELLERS"
           description="Our most-loved products with thousands of 5-star reviews"
-          products={productData.bestSellers}
+          products={productData.productReferences.bestSellers}
         />
         <ProductSection
           title="SHOP BY CATEGORY"
           description="Find your perfect match in our curated collections"
           products={productData.categories}
-        /> */}
+        />
         {/* Add other sections here as needed */}
 
         {/* Instagram Feed */}
-        {/* <section className="min-h-screen bg-white py-20 flex items-center">
+        <section className="min-h-screen bg-white py-20 flex items-center">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -84,10 +82,10 @@ export default function LandingPage() {
               </a>
             </div>
           </div>
-        </section> */}
+        </section>
 
         {/* Newsletter */}
-        {/* <section className="bg-rose-100 py-20">
+        <section className="bg-rose-100 py-20">
           <div className="container mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -112,9 +110,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
           </div>
-        </section> */}
-        {/* <Footer /> */}
-      </main>
-    </div>
+        </section>
+    </>
   );
 }
