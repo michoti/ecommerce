@@ -1,1 +1,0 @@
-type DialogType = "edit" | "delete" | "add" | "view" | null;
