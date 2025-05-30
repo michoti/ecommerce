@@ -155,7 +155,7 @@ const ShopPage = () => {
   }
 
   return (
-    <div className="container mx-auto my-16 px-4 pt-16">
+    <div className="mx-16 my-6 lg:mx-24 pt-20 lg:pt-28">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

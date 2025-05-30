@@ -1,10 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Navbar from "./Navbar";
 import HeroSection from "./HeroSection";
 import ProductSection from "./ProductSection";
-import Footer from "./Footer";
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";

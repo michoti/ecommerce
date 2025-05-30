@@ -1,9 +1,61 @@
-export const productData = {
+export interface Variant {
+  id: string;
+  shade?: string;
+  size?: string;
+  price: number;
+  sku: string;
+  stock: number;
+  notes?: string[];
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  images: string[];
+  finish?: string;
+  coverage?: string;
+  shortDescription: string;
+  longDescription: string;
+  variants: Variant[];
+  avgRating: number;
+  reviews: {
+    id: string;
+    rating: number;
+    comment: string;
+    reviewer: string;
+    date: string;
+  }[];
+}
+
+export interface Collection {
+  name: string;
+  productIds: number[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  image: string;
+  collections: Record<string, Collection>;
+}
+
+export interface ProductData {
+  lastUpdated: string;
+  products: Record<number, Product>;
+  categories: Record<string, Category>;
+  productReferences: { featured: number[]; bestSellers: number[] };
+}
+
+
+
+export const productData: ProductData = {
   lastUpdated: "2025-05-29T14:17:00Z",
   products: {
     1: {
       id: 1,
       name: "Classic Matte Lip",
+      slug: "classic-matte-lip",
       images: [
         "/products/lipstick-1-front.jpg",
         "/products/lipstick-1-angle.jpg",
@@ -27,6 +79,7 @@ export const productData = {
     2: {
       id: 2,
       name: "Satin Lip Color",
+      slug: "satin-lip-color",
       images: [
         "/products/lipstick-2-front.jpg",
         "/products/lipstick-2-angle.jpg",
@@ -50,6 +103,7 @@ export const productData = {
     3: {
       id: 3,
       name: "Lip Gloss Luxe",
+      slug: "lip-gloss-luxe",
       images: [
         "/products/gloss-1-front.jpg",
         "/products/gloss-1-angle.jpg",
@@ -73,6 +127,7 @@ export const productData = {
     4: {
       id: 4,
       name: "Hydrating Lip Tint",
+      slug: "hydrating-lip-tint",
       images: [
         "/products/tint-1-front.jpg",
         "/products/tint-1-angle.jpg",
@@ -96,6 +151,7 @@ export const productData = {
     5: {
       id: 5,
       name: "Satin Finish Foundation",
+      slug: "satin-finish-foundation",
       images: [
         "/products/foundation-1-front.jpg",
         "/products/foundation-1-angle.jpg",
@@ -119,6 +175,7 @@ export const productData = {
     6: {
       id: 6,
       name: "Velvet Cream Blush",
+      slug: "velvet-cream-blush",
       images: [
         "/products/blush-1-front.jpg",
         "/products/blush-1-angle.jpg",
@@ -142,6 +199,7 @@ export const productData = {
     7: {
       id: 7,
       name: "Multi-Stick Blush",
+      slug: "multi-stick-blush",
       images: [
         "/products/blush-2-front.jpg",
         "/products/blush-2-angle.jpg",
@@ -165,6 +223,7 @@ export const productData = {
     8: {
       id: 8,
       name: "Dewy Highlighter",
+      slug: "dewy-highlighter",
       images: [
         "/products/highlighter-1-front.jpg",
         "/products/highlighter-1-angle.jpg",
@@ -188,6 +247,7 @@ export const productData = {
     9: {
       id: 9,
       name: "Perfume Classic",
+      slug: "perfume-classic",
       images: [
         "/products/perfume-1-front.jpg",
         "/products/perfume-1-angle.jpg",

@@ -8,6 +8,7 @@ import { productData } from "@/lib/data";
 interface Product {
   id: number;
   name: string;
+  slug: string;
   image: string;
   finish?: string;
   coverage?: string;
@@ -86,22 +87,24 @@ export default function ProductSection({ title, description, products }: Product
                 viewport={{ once: true }}
                 className="group"
               >
-                <div className="relative overflow-hidden rounded-lg mb-4 aspect-square bg-gray-100">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">
-                    {product.finish || product.coverage || "Product"}
-                  </p>
-                  <h3 className="font-medium text-rose-900">{product.name}</h3>
-                  <p className="text-gray-700">
-                    ${Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
-                  </p>
-                </div>
+                <a href={`/product/${product.slug}`}>
+                  <div className="relative overflow-hidden rounded-lg mb-4 aspect-square bg-gray-100">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500 mb-1">
+                      {product.finish || product.coverage || "Product"}
+                    </p>
+                    <h3 className="font-medium text-rose-900">{product.name}</h3>
+                    <p className="text-gray-700">
+                      ${Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
+                    </p>
+                  </div>
+                </a>
               </motion.div>
             ))}
           {categoryList &&

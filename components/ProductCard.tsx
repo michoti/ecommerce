@@ -9,6 +9,7 @@ import { FC } from 'react';
 interface Product {
   id: string;
   name: string;
+  slug: string;
   image: string;
   finish?: string;
   coverage?: string;
@@ -23,9 +24,9 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = ({ product, index }) => {
   const router = useRouter();
 
-  // Handle click to navigate to product details (optional)
+  // Handle click to navigate to product details using slug
   const handleClick = () => {
-    router.push(`/product/${product.id}`);
+    router.push(`/products/${product.slug}`);
   };
 
   return (

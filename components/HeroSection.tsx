@@ -1,8 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
+
+  const router = useRouter();
   // Text to animate letter by letter
   const titleText = "ELEVATE BEAUTY";
   const subtitleText = "Discover our collection of luxury makeup and skincare products";
@@ -24,6 +27,10 @@ export default function HeroSection() {
       }
     }
   };
+
+  const handleClick = () => {
+     router.push('/shop');
+  }
 
   return (
     <section
@@ -66,6 +73,7 @@ export default function HeroSection() {
               duration: 0.5,
               delay: (titleText.length * 0.1) + 1.3 // Appear after subtitle
             }}
+            onClick={handleClick}
           >
             SHOP NOW
           </motion.button>
