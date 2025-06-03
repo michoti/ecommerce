@@ -122,47 +122,8 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  email: 'email',
-  password: 'password',
-  name: 'name',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.ProductScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  price: 'price',
-  stock: 'stock',
-  categoryId: 'categoryId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.CategoryScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.OrderScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  total: 'total',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.OrderItemScalarFieldEnum = {
-  id: 'id',
-  orderId: 'orderId',
-  productId: 'productId',
-  quantity: 'quantity',
-  price: 'price',
-  createdAt: 'createdAt'
 };
 
 exports.Prisma.CartScalarFieldEnum = {
@@ -175,9 +136,137 @@ exports.Prisma.CartScalarFieldEnum = {
 exports.Prisma.CartItemScalarFieldEnum = {
   id: 'id',
   cartId: 'cartId',
-  productId: 'productId',
+  variantId: 'variantId',
   quantity: 'quantity',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CollectionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  shortDescription: 'shortDescription',
+  longDescription: 'longDescription',
+  finish: 'finish',
+  coverage: 'coverage',
+  avgRating: 'avgRating',
+  images: 'images',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VariantScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  shade: 'shade',
+  size: 'size',
+  price: 'price',
+  sku: 'sku',
+  stock: 'stock',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReviewScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  rating: 'rating',
+  comment: 'comment',
+  reviewer: 'reviewer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  shippingAddressId: 'shippingAddressId',
+  billingAddressId: 'billingAddressId',
+  shippingMethod: 'shippingMethod',
+  shippingCost: 'shippingCost',
+  paymentMethod: 'paymentMethod',
+  subtotal: 'subtotal',
+  total: 'total',
+  status: 'status',
+  couponCode: 'couponCode',
+  giftOption: 'giftOption',
+  additionalNotes: 'additionalNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  variantId: 'variantId',
+  quantity: 'quantity',
+  price: 'price',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ShippingAddressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  company: 'company',
+  address: 'address',
+  apartment: 'apartment',
+  city: 'city',
+  state: 'state',
+  zipCode: 'zipCode',
+  country: 'country',
+  phone: 'phone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BillingAddressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  company: 'company',
+  address: 'address',
+  apartment: 'apartment',
+  city: 'city',
+  state: 'state',
+  zipCode: 'zipCode',
+  country: 'country',
+  phone: 'phone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  discount: 'discount',
+  type: 'type',
+  validFrom: 'validFrom',
+  validUntil: 'validUntil',
+  maxUses: 'maxUses',
+  usedCount: 'usedCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -194,16 +283,43 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.ShippingMethod = exports.$Enums.ShippingMethod = {
+  FLAT: 'FLAT',
+  EXPRESS: 'EXPRESS',
+  OVERNIGHT: 'OVERNIGHT'
+};
 
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  CARD: 'CARD',
+  CASH: 'CASH'
+};
+
+exports.OrderStatus = exports.$Enums.OrderStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED'
+};
+
+exports.CouponType = exports.$Enums.CouponType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED: 'FIXED'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Product: 'Product',
+  Cart: 'Cart',
+  CartItem: 'CartItem',
   Category: 'Category',
+  Collection: 'Collection',
+  Product: 'Product',
+  Variant: 'Variant',
+  Review: 'Review',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  Cart: 'Cart',
-  CartItem: 'CartItem'
+  ShippingAddress: 'ShippingAddress',
+  BillingAddress: 'BillingAddress',
+  Coupon: 'Coupon'
 };
 
 /**

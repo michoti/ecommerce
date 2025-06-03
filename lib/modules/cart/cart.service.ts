@@ -1,175 +1,273 @@
 import db from '@/lib/prismadb';
-import { Cart, CartItem } from '@/app/generated/prisma';
-import { CartItemInput } from './cart.types';
-import { BadRequestError, NotFoundError } from './errors';
+import { Cart, CartItemInput } from './cart.types';
 
-export class CartService {
 
-  async createCart(userId?: string): Promise<Cart> {
-    if (userId) {
-      const existingCart = await db.cart.findUnique({ where: { userId } });
-      if (existingCart) {
-        throw new BadRequestError('Cart already exists for this user');
-      }
-    }
 
-    return db.cart.create({
-      data: {
-        userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-  }
-
-  async getCartByUserId(userId?: string): Promise<Cart | null> {
-    if (!userId) return null;
-    return db.cart.findUnique({
+export const getCart = async (userId: string | null): Promise<Cart | null> => {
+  if (!userId) return null;
+  try {
+    const cart = await db.cart.findFirst({
       where: { userId },
       include: {
         items: {
           include: {
-            variant: {
-              select: {
-                id: true,
-                shade: true,
-                size: true,
-                price: true,
-                stock: true,
-                product: {
-                  select: { name: true, slug: true, images: true },
-                },
-              },
-            },
+            variant: { include: { product: true } },
           },
         },
       },
     });
+    return cart
+      ? {
+          id: cart.id,
+          userId: cart.userId,
+          items: cart.items.map((item) => ({
+            id: item.id,
+            variantId: item.variantId,
+            quantity: item.quantity,
+            variant: {
+              id: item.variant.id,
+              productId: item.variant.productId,
+              shade: item.variant.shade,
+              size: item.variant.size,
+              price: item.variant.price,
+              sku: item.variant.sku,
+              stock: item.variant.stock,
+              product: {
+                name: item.variant.product.name,
+                slug: item.variant.product.slug,
+                images: item.variant.product.images,
+              },
+            },
+          })),
+          createdAt: cart.createdAt.toISOString(),
+          updatedAt: cart.updatedAt.toISOString(),
+        }
+      : null;
+  } catch (error) {
+    throw new Error(`Failed to fetch cart: ${error.message}`);
+  } finally {
+    await db.$disconnect();
   }
+};
 
-  async addItemToCart(userId: string | undefined, variantId: string, quantity: number): Promise<CartItem> {
-    if (quantity <= 0) {
-      throw new BadRequestError('Quantity must be greater than 0');
-    }
-
-    const variant = await db.variant.findUnique({ where: { id: variantId } });
+export const addToCart = async (userId: string | null, input: CartItemInput): Promise<Cart> => {
+  try {
+    const variant = await db.variant.findUnique({ where: { id: input.variantId } });
     if (!variant) {
-      throw new NotFoundError('Variant not found');
+      throw new Error('Variant not found');
     }
-    if (variant.stock < quantity) {
-      throw new BadRequestError('Insufficient stock');
-    }
-
-    if (!userId) {
-      throw new BadRequestError('Anonymous cart should be handled locally');
+    if (input.quantity > variant.stock) {
+      throw new Error('Insufficient stock');
     }
 
-    let cart = await this.getCartByUserId(userId);
+    let cart = await db.cart.findFirst({ where: { userId } });
+    if (!cart && userId) {
+      cart = await db.cart.create({ data: { userId } });
+    }
+
     if (!cart) {
-      cart = await this.createCart(userId);
+      throw new Error('Cart not found');
     }
 
     const existingItem = await db.cartItem.findFirst({
-      where: { cartId: cart.id, variantId },
+      where: { cartId: cart.id, variantId: input.variantId },
     });
 
     if (existingItem) {
-      return db.cartItem.update({
+      await db.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
+        data: { quantity: existingItem.quantity + input.quantity },
+      });
+    } else {
+      await db.cartItem.create({
+        data: { cartId: cart.id, variantId: input.variantId, quantity: input.quantity },
       });
     }
 
-    return db.cartItem.create({
-      data: {
-        cartId: cart.id,
-        variantId,
-        quantity,
+    const updatedCart = await db.cart.findUnique({
+      where: { id: cart.id },
+      include: {
+        items: {
+          include: {
+            variant: { include: { product: true } },
+          },
+        },
       },
     });
-  }
 
-  async updateCartItemQuantity(cartItemId: string, quantity: number): Promise<CartItem> {
-    if (quantity <= 0) {
-      throw new BadRequestError('Quantity must be greater than 0');
+    if (!updatedCart) {
+      throw new Error('Failed to fetch updated cart');
     }
 
+    return {
+      id: updatedCart.id,
+      userId: updatedCart.userId,
+      items: updatedCart.items.map((item) => ({
+        id: item.id,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        variant: {
+          id: item.variant.id,
+          productId: item.variant.productId,
+          shade: item.variant.shade,
+          size: item.variant.size,
+          price: item.variant.price,
+          sku: item.variant.sku,
+          stock: item.variant.stock,
+          product: {
+            name: item.variant.product.name,
+            slug: item.variant.product.slug,
+            images: item.variant.product.images,
+          },
+        },
+      })),
+      createdAt: updatedCart.createdAt.toISOString(),
+      updatedAt: updatedCart.updatedAt.toISOString(),
+    };
+  } catch (error) {
+    throw new Error(`Failed to add to cart: ${error.message}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const updateCartItem = async (userId: string | null, cartItemId: string, quantity: number): Promise<Cart> => {
+  try {
     const cartItem = await db.cartItem.findUnique({
       where: { id: cartItemId },
       include: { variant: true },
     });
+
     if (!cartItem) {
-      throw new NotFoundError('Cart item not found');
-    }
-    if (cartItem.variant.stock < quantity) {
-      throw new BadRequestError('Insufficient stock');
+      throw new Error('Cart item not found');
     }
 
-    return db.cartItem.update({
+    if (quantity > cartItem.variant.stock) {
+      throw new Error('Insufficient stock');
+    }
+
+    await db.cartItem.update({
       where: { id: cartItemId },
       data: { quantity },
     });
-  }
 
-  async removeCartItem(cartItemId: string): Promise<void> {
-    const cartItem = await db.cartItem.findUnique({ where: { id: cartItemId } });
+    const cart = await db.cart.findUnique({
+      where: { id: cartItem.cartId },
+      include: {
+        items: {
+          include: {
+            variant: { include: { product: true } },
+          },
+        },
+      },
+    });
+
+    if (!cart) {
+      throw new Error('Cart not found');
+    }
+
+    return {
+      id: cart.id,
+      userId: cart.userId,
+      items: cart.items.map((item) => ({
+        id: item.id,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        variant: {
+          id: item.variant.id,
+          productId: item.variant.productId,
+          shade: item.variant.shade,
+          size: item.variant.size,
+          price: item.variant.price,
+          sku: item.variant.sku,
+          stock: item.variant.stock,
+          product: {
+            name: item.variant.product.name,
+            slug: item.variant.product.slug,
+            images: item.variant.product.images,
+          },
+        },
+      })),
+      createdAt: cart.createdAt.toISOString(),
+      updatedAt: cart.updatedAt.toISOString(),
+    };
+  } catch (error) {
+    throw new Error(`Failed to update cart item: ${error.message}`);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const removeCartItem = async (userId: string | null, cartItemId: string): Promise<Cart> => {
+  try {
+    const cartItem = await db.cartItem.findUnique({
+      where: { id: cartItemId },
+    });
+
     if (!cartItem) {
-      throw new NotFoundError('Cart item not found');
+      throw new Error('Cart item not found');
     }
 
     await db.cartItem.delete({ where: { id: cartItemId } });
-  }
 
-  async clearCart(userId: string): Promise<void> {
-    const cart = await this.getCartByUserId(userId);
-    if (!cart) {
-      throw new NotFoundError('Cart not found');
-    }
-
-    await db.cartItem.deleteMany({
-      where: { cartId: cart.id },
+    const cart = await db.cart.findUnique({
+      where: { id: cartItem.cartId },
+      include: {
+        items: {
+          include: {
+            variant: { include: { product: true } },
+          },
+        },
+      },
     });
-  }
 
-  async deleteCart(userId: string): Promise<void> {
-    const cart = await this.getCartByUserId(userId);
     if (!cart) {
-      throw new NotFoundError('Cart not found');
+      throw new Error('Cart not found');
     }
 
-    await db.cart.delete({ where: { id: cart.id } });
+    return {
+      id: cart.id,
+      userId: cart.userId,
+      items: cart.items.map((item) => ({
+        id: item.id,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        variant: {
+          id: item.variant.id,
+          productId: item.variant.productId,
+          shade: item.variant.shade,
+          size: item.variant.size,
+          price: item.variant.price,
+          sku: item.variant.sku,
+          stock: item.variant.stock,
+          product: {
+            name: item.variant.product.name,
+            slug: item.variant.product.slug,
+            images: item.variant.product.images,
+          },
+        },
+      })),
+      createdAt: cart.createdAt.toISOString(),
+      updatedAt: cart.updatedAt.toISOString(),
+    };
+  } catch (error) {
+    throw new Error(`Failed to remove cart item: ${error.message}`);
+  } finally {
+    await prisma.$disconnect();
   }
+};
 
-  async mergeLocalCart(userId: string, localItems: CartItemInput[]): Promise<Cart> {
-    let cart = await this.getCartByUserId(userId);
+export const mergeCart = async (userId: string, items: CartItemInput[]): Promise<Cart> => {
+  try {
+    for (const item of items) {
+      await addToCart(userId, item);
+    }
+    const cart = await getCart(userId);
     if (!cart) {
-      cart = await this.createCart(userId);
+      throw new Error('Failed to fetch merged cart');
     }
-
-    for (const item of localItems) {
-      const variant = await db.variant.findUnique({ where: { id: item.variantId } });
-      if (variant && variant.stock >= item.quantity) {
-        const existingItem = await db.cartItem.findFirst({
-          where: { cartId: cart.id, variantId: item.variantId },
-        });
-
-        if (existingItem) {
-          await db.cartItem.update({
-            where: { id: existingItem.id },
-            data: { quantity: existingItem.quantity + item.quantity },
-          });
-        } else {
-          await db.cartItem.create({
-            data: {
-              cartId: cart.id,
-              variantId: item.variantId,
-              quantity: item.quantity,
-            },
-          });
-        }
-      }
-    }
-
-    return this.getCartByUserId(userId) as Promise<Cart>;
+    return cart;
+  } catch (error) {
+    throw new Error(`Failed to merge cart: ${error.message}`);
   }
-}
+};

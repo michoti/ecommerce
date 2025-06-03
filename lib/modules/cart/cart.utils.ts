@@ -3,7 +3,7 @@ import { Cart } from './cart.types';
 export const calculateCartTotal = (cart: Cart | null): number => {
   if (!cart || !cart.items) return 0;
   return cart.items.reduce((total, item) => {
-    return total + (item.variant.price || 0) * item.quantity;
+    return total + (item?.variant?.price || 0) * item.quantity;
   }, 0);
 };
 

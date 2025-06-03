@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 const fetchCart = async (userId: string | null): Promise<Cart | null> => {
   if (!userId) return null;
-  const response = await fetch('/api/src/cart');
+  const response = await fetch('/api/cart');
   if (!response.ok) {
     throw new Error('Failed to fetch cart');
   }
@@ -15,15 +15,20 @@ const fetchCart = async (userId: string | null): Promise<Cart | null> => {
 };
 
 const addToCart = async (userId: string | null, input: CartItemInput): Promise<Cart> => {
+  console.log(" CART-008");
   if (!userId) {
+    console.log(" ########### USER ID NOT PRESENT ###################");
     await useCartStore.getState().addItem(input.variantId, input.quantity);
     return useCartStore.getState().cart!;
   }
-  const response = await fetch('/api/src/cart', {
+  console.log(" CART-009");
+  const response = await fetch('/api/cart', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   });
+
+  console.log("this is the add to cart resp :", response)
   if (!response.ok) {
     throw new Error('Failed to add to cart');
   }
@@ -35,7 +40,7 @@ const updateCartItem = async (userId: string | null, cartId: string, cartItemId:
     await useCartStore.getState().updateItemQuantity(cartItemId, quantity);
     return useCartStore.getState().cart!;
   }
-  const response = await fetch(`/api/src/cart/${cartId}`, {
+  const response = await fetch(`/api/cart/${cartId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ cartItemId, quantity }),
@@ -51,7 +56,7 @@ const removeCartItem = async (userId: string | null, cartId: string, cartItemId:
     await useCartStore.getState().removeItem(cartItemId);
     return useCartStore.getState().cart!;
   }
-  const response = await fetch(`/api/src/cart/${cartId}`, {
+  const response = await fetch(`/api/cart/${cartId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ cartItemId }),
@@ -64,7 +69,7 @@ const removeCartItem = async (userId: string | null, cartId: string, cartItemId:
 
 const mergeCart = async (userId: string, items: CartItemInput[]): Promise<Cart> => {
   for (const item of items) {
-    const response = await fetch('/api/src/cart', {
+    const response = await fetch('/api/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
@@ -73,7 +78,7 @@ const mergeCart = async (userId: string, items: CartItemInput[]): Promise<Cart> 
       throw new Error('Failed to merge cart item');
     }
   }
-  const response = await fetch('/api/src/cart');
+  const response = await fetch('/api/cart');
   if (!response.ok) {
     throw new Error('Failed to fetch merged cart');
   }
@@ -81,7 +86,10 @@ const mergeCart = async (userId: string, items: CartItemInput[]): Promise<Cart> 
 };
 
 export const useCartQuery = () => {
-  const { userId } = useAuth();
+  // const { userId } = useAuth();
+  const { userId } = {
+    userId: "1"
+  };
   return useQuery<Cart | null, Error>({
     queryKey: ['cart', userId],
     queryFn: () => fetchCart(userId),
@@ -91,8 +99,14 @@ export const useCartQuery = () => {
 };
 
 export const useAddToCartMutation = () => {
-  const { userId } = useAuth();
+  console.log(" CART-006");
+  // const { userId } = useAuth();
+  // const { userId } = {
+  //   userId: null
+  // };
+  const userId = null;
   const queryClient = useQueryClient();
+  console.log(" CART-007");
   return useMutation<Cart, Error, CartItemInput>({
     mutationFn: (input) => addToCart(userId, input),
     onSuccess: (cart) => {
@@ -109,7 +123,10 @@ export const useAddToCartMutation = () => {
 };
 
 export const useUpdateCartItemMutation = () => {
-  const { userId } = useAuth();
+    // const { userId } = useAuth();
+    const { userId } = {
+      userId: "1"
+    };
   const queryClient = useQueryClient();
   return useMutation<Cart, Error, { cartId: string; cartItemId: string; quantity: number }>({
     mutationFn: ({ cartId, cartItemId, quantity }) => updateCartItem(userId, cartId, cartItemId, quantity),
@@ -127,7 +144,11 @@ export const useUpdateCartItemMutation = () => {
 };
 
 export const useRemoveCartItemMutation = () => {
-  const { userId } = useAuth();
+    // const { userId } = useAuth();
+    // const { userId } = {
+    //   userId: "1"
+    // };
+    const userId = null;
   const queryClient = useQueryClient();
   return useMutation<Cart, Error, { cartId: string; cartItemId: string }>({
     mutationFn: ({ cartId, cartItemId }) => removeCartItem(userId, cartId, cartItemId),
@@ -145,7 +166,10 @@ export const useRemoveCartItemMutation = () => {
 };
 
 export const useMergeCartMutation = () => {
-  const { userId } = useAuth();
+    // const { userId } = useAuth();
+    const { userId } = {
+      userId: "1"
+    };
   const queryClient = useQueryClient();
   return useMutation<Cart, Error, CartItemInput[]>({
     mutationFn: (items) => mergeCart(userId!, items),

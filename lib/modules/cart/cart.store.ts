@@ -12,6 +12,7 @@ export const useCartStore = create<CartState>()(
         if (quantity <= 0) throw new Error('Quantity must be greater than 0');
         const currentCart = get().cart || { id: 'local', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         let variant;
+        console.log("### AddItem fxn running in cart.store");
         for (const product of Object.values(productData.products)) {
           variant = product.variants.find((v) => v.id === variantId);
           if (variant) {
@@ -55,6 +56,7 @@ export const useCartStore = create<CartState>()(
       clearCart: () => set({ cart: null }),
       mergeCart: (serverCart) => {
         const currentCart = get().cart;
+        console.log("### This is the current cart in mergeCart in the cart.store file :", currentCart);
         if (!currentCart || currentCart.id !== 'local') {
           set({ cart: serverCart });
           return;

@@ -9,484 +9,475 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-  SheetClose,
-} from '@/components/ui/sheet';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogClose,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from '@/components/ui/sheet';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Heart, Search, ShoppingBag, User, Menu, X } from 'lucide-react';
+import { Heart, Search, ShoppingCart, User, Menu, X, Home } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { productData } from '@/lib/data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useCartQuery, useCartStore } from '@/lib/modules/cart/cart.queries';
+import { useCartQuery } from '@/lib/modules/cart/cart.queries';
 import { getCartItemCount } from '@/lib/modules/cart/cart.utils';
-import { toast } from '@shadcn/sonner';
+import { useCartMerge } from '@/lib/modules/cart/useCartMerge';
+import { SearchResponse, Category } from '@/lib/modules/cart/cart.types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useWishlistStore } from '@/lib/modules/wishlist/wishlist.store';
+import { useCartStore } from '@/lib/modules/cart/cart.store';
 
-interface SearchResult {
-  id: number;
-  name: string;
-  slug: string;
-  image: string;
-  shortDescription: string;
-  finish?: string;
-  coverage?: string;
-  variants: Array<{
-    id: string;
-    shade?: string;
-    size?: string;
-    price: number;
-    sku: string;
-    stock: number;
-  }>;
-  avgRating: number;
-}
+const fetchCategories = async (): Promise<Category[]> => {
+  const response = await fetch('/api/search');
+  if (!response.ok) throw new Error('Failed to fetch categories');
+  const { results } = await response.json();
+  const categories = new Map<string, Category>();
+  results.forEach((product: any) => {
+    product.collections.forEach((collection: any) => {
+      const category = collection.category;
+      if (!categories.has(category.id)) {
+        categories.set(category.id, { id: category.id, name: category.name, collections: [] });
+      }
+      const cat = categories.get(category.id)!;
+      if (!cat.collections.some((c) => c.id === collection.id)) {
+        cat.collections.push({ id: collection.id, name: collection.name, products: [product] });
+      } else {
+        cat.collections.find((c) => c.id === collection.id)!.products.push(product);
+      }
+    });
+  });
+  return Array.from(categories.values());
+};
 
-interface SearchResponse {
-  results: SearchResult[];
-  count: number;
-  lastUpdated: string;
-}
+const fetchSearchResults = async (query: string): Promise<SearchResponse> => {
+  if (query.trim().length < 2) return { results: [], count: 0, lastUpdated: '' };
+  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+  if (!response.ok) throw new Error('Failed to fetch search results');
+  return response.json();
+};
 
-export default function Navbar() {
-  const [scrollY, setScrollY] = useState<number>(0);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+// Bottom Navigation Component
+const BottomNavigation = () => {
   const pathname = usePathname();
   const { data: cart } = useCartQuery();
   const cartState = useCartStore((state) => state.cart);
+  const wishlistItems = useWishlistStore((state) => state.items);
   const cartItemCount = getCartItemCount(cart || cartState);
+
+  const navItems = [
+    { href: '/', icon: Home, label: 'Home' },
+    { href: '/wishlist', icon: Heart, label: 'Wishlist', badge: wishlistItems.length },
+    { href: '/cart', icon: ShoppingCart, label: 'Cart', badge: cartItemCount },
+    { href: '/account', icon: User, label: 'Account' },
+  ];
+
+  return (
+    <motion.div
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+        <div className="flex items-center justify-around px-4 py-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            
+            return (
+              <Link key={item.href} href={item.href} className="flex-1">
+                <motion.div
+                  className="flex flex-col items-center py-2 px-3 relative"
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <motion.div
+                    className="relative"
+                    animate={{
+                      scale: isActive ? 1.1 : 1,
+                      y: isActive ? -2 : 0,
+                    }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                  >
+                    <Icon
+                      className={`h-6 w-6 transition-colors duration-200 ${
+                        isActive ? 'text-yellow-500' : 'text-gray-600'
+                      }`}
+                    />
+                    {item.badge && item.badge > 0 && (
+                      <motion.span
+                        className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      >
+                        {item.badge > 99 ? '99+' : item.badge}
+                      </motion.span>
+                    )}
+                  </motion.div>
+                  <motion.span
+                    className={`text-xs mt-1 font-medium transition-colors duration-200 ${
+                      isActive ? 'text-yellow-500' : 'text-gray-600'
+                    }`}
+                    animate={{
+                      opacity: isActive ? 1 : 0.8,
+                    }}
+                  >
+                    {item.label}
+                  </motion.span>
+                  
+                  {/* Active indicator */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        className="absolute -top-1 left-1/2 w-1 h-1 bg-yellow-500 rounded-full"
+                        initial={{ scale: 0, x: '-50%' }}
+                        animate={{ scale: 1, x: '-50%' }}
+                        exit={{ scale: 0, x: '-50%' }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default function Navbar() {
+  const [scrollY, setScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const pathname = usePathname();
+  const { data: cart } = useCartQuery();
+  const cartState = useCartStore((state) => state.cart);
+  const wishlistItems = useWishlistStore((state) => state.items);
+  const cartItemCount = getCartItemCount(cart || cartState);
+  useCartMerge();
+
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: searchData, isLoading: searchLoading } = useQuery({
+    queryKey: ['search', searchQuery],
+    queryFn: () => fetchSearchResults(searchQuery),
+    enabled: searchQuery.trim().length >= 2,
+    staleTime: 5 * 60 * 1000,
+  });
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     const handleScroll = () => setScrollY(window.scrollY);
-
     handleResize();
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll);
-
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const { data, isLoading, error } = useQuery<SearchResponse>({
-    queryKey: ['search', searchQuery],
-    queryFn: async () => {
-      if (searchQuery.trim().length < 2) {
-        return { results: [], count: 0, lastUpdated: '' };
-      }
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch search results');
-      }
-      return response.json();
-    },
-    enabled: searchQuery.trim().length >= 2,
-    staleTime: 5 * 60 * 1000,
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
   const resetSearch = () => {
     setSearchQuery('');
     setIsSearchOpen(false);
   };
 
-  const getButtonClass = (buttonPath: string): string => {
-    const isActive =
-      (buttonPath === '/search' && (pathname === '/search' || isSearchOpen)) ||
-      (buttonPath !== '/search' && pathname === buttonPath);
-    return `flex flex-col items-center gap-1 relative transition-colors duration-200 ${
-      isActive ? 'text-rose-700 font-semibold' : 'text-slate-600 hover:text-rose-900'
-    }`;
-  };
-
-  const getIconClass = (buttonPath: string): string => {
-    const isActive =
-      (buttonPath === '/search' && (pathname === '/search' || isSearchOpen)) ||
-      (buttonPath !== '/search' && pathname === buttonPath);
-    return isActive ? 'text-rose-700' : 'text-slate-600';
-  };
+  // Determine header background based on scroll position
+  const headerBg = scrollY > 50 
+    ? 'bg-white/95 backdrop-blur-lg shadow-md' 
+    : scrollY > 0 
+      ? 'bg-white/80 backdrop-blur-sm' 
+      : 'bg-transparent';
 
   return (
     <>
-      <header
-        className={`fixed w-full top-0 z-40 transition-all duration-300 ${
-          scrollY > 20 ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent'
-        }`}
+      <motion.header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex-1 md:flex-none">
-            <Link href="/" className="text-xl font-semibold text-rose-900">
-              STAR COSMETICS
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Image src="/logo.png" alt="Star Cosmetics" width={120} height={40} />
+                </motion.div>
+              </Link>
+            </div>
 
-          <div className="hidden md:block">
-            <NavigationMenu>
-              <NavigationMenuList className="bg-transparent">
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-rose-50/50 text-rose-900">
-                    Shop
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-white/80 backdrop-blur-sm">
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                      {Object.values(productData.categories).map((category) => (
-                        <li
-                          key={category.id}
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-rose-50/50"
-                        >
-                          <NavigationMenuLink asChild>
-                            <Link href={`/category/${category.id}`} className="flex gap-2 items-center">
-                              <div className="w-10 h-10 rounded-full bg-rose-200 flex items-center justify-center">
-                                <span className="text-xs text-rose-700">{category.name[0]}</span>
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-rose-900">{category.name}</div>
-                                <p className="text-xs text-slate-500">
-                                  Explore {category.name.toLowerCase()} products
-                                </p>
-                              </div>
-                            </Link>
-                          </NavigationMenuLink>
-                          <ul className="pl-6 text-xs text-slate-600">
-                            {Object.entries(category.collections).map(([collectionId, collection]) => (
-                              <li key={collectionId}>
+            {/* Desktop Navigation */}
+            {!isMobile && (
+              <NavigationMenu className="hidden md:flex">
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-900 hover:text-yellow-400 transition-colors duration-200">
+                      Categories
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <motion.ul
+                        className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {categoriesLoading
+                          ? <div className="text-center py-4">Loading...</div>
+                          : categories?.map((category) => (
+                              <li key={category.id}>
                                 <NavigationMenuLink asChild>
-                                  <Link
-                                    href={`/category/${category.id}/${collectionId}`}
-                                    className="block py-1 hover:text-rose-700"
-                                  >
-                                    {collection.name}
-                                  </Link>
+                                  <Accordion type="single" collapsible>
+                                    <AccordionItem value={category.id} className="border-b-0">
+                                      <AccordionTrigger className="text-sm font-medium text-gray-900 hover:text-yellow-400 transition-colors duration-200">
+                                        {category.name}
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        <ul className="space-y-2">
+                                          {category.collections.map((collection) => (
+                                            <li key={collection.id}>
+                                              <Link
+                                                href={`/shop?category=${category.id}&collection=${collection.id}`}
+                                                className="text-sm text-gray-600 hover:text-yellow-400 transition-colors duration-200"
+                                              >
+                                                {collection.name}
+                                              </Link>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  </Accordion>
                                 </NavigationMenuLink>
                               </li>
                             ))}
-                          </ul>
-                        </li>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    className={`${navigationMenuTriggerStyle()} bg-transparent hover:bg-rose-50/50 text-rose-900`}
-                    href="/new-arrivals"
-                  >
-                    New Arrivals
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    className={`${navigationMenuTriggerStyle()} bg-transparent hover:bg-rose-50/50 text-rose-900`}
-                    href="/best-sellers"
-                  >
-                    Best Sellers
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    className={`${navigationMenuTriggerStyle()} bg-transparent hover:bg-rose-50/50 text-rose-900`}
-                    href="/about"
-                  >
-                    About
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
+                      </motion.ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>                  
+                    <NavigationMenuLink 
+                      href='/shop' 
+                      className={`${navigationMenuTriggerStyle()} transition-colors duration-200 hover:text-yellow-400`}
+                    >
+                      Shop
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
 
-          <div className="hidden md:flex items-center gap-4">
-            <Dialog onOpenChange={(open) => (!open ? resetSearch() : setIsSearchOpen(true))}>
-              <DialogTrigger asChild>
-                <button className="p-2 hover:bg-rose-50/50 rounded-full" aria-label="Search">
-                  <Search size={20} />
-                </button>
-              </DialogTrigger>
-              <DialogContent className="w-[85vw] h-[400px] bg-white/80 backdrop-blur-md p-6 rounded-lg">
-                <VisuallyHidden content={<DialogTitle>Search Products</DialogTitle>} />
-                <div className="w-full">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Search size={24} className="text-rose-600" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full p-2 text-gray-900 bg-transparent border-b border-rose-200 focus:outline-none focus:border-rose-700"
-                      autoFocus
-                    />
-                    <DialogClose asChild>
-                      <button className="p-2 hover:bg-gray-100 rounded-full" aria-label="Close search">
-                        <X size={20} />
-                      </button>
-                    </DialogClose>
-                  </div>
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {isLoading && <p className="text-rose-600 text-sm">Loading...</p>}
-                    {error && (
-                      <p className="text-red-500 text-sm">Failed to fetch search results. Please try again.</p>
-                    )}
-                    {!isLoading && !error && data?.results.length === 0 && searchQuery.length >= 2 && (
-                      <p className="text-rose-600 text-sm">No products found.</p>
-                    )}
-                    {!isLoading && !error && data?.results.length > 0 && (
-                      <ul className="grid gap-4 md:grid-cols-2">
-                        {data.results.map((product) => (
-                          <li key={product.id} className="flex items-center gap-4 p-3 hover:bg-rose-100 rounded-md">
-                            <Link href={`/product/${product.slug}`} className="flex gap-4 w-full">
-                              <Image
-                                src={product.image}
-                                alt={product.name}
-                                width={80}
-                                height={80}
-                                className="object-cover rounded-md"
-                              />
-                              <div>
-                                <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
-                                <p className="text-xs text-gray-600">{product.shortDescription}</p>
-                                <p className="text-xs text-rose-600">
-                                  {product.variants[0]?.price ? `$${product.variants[0].price.toFixed(2)}` : 'Price unavailable'}
-                                </p>
-                              </div>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <Link href="/account" className="p-2 hover:bg-gray-100 rounded-full" aria-label="Account">
-              <User size={20} />
-            </Link>
-            <button className="p-2 hover:bg-gray-100 rounded-full" aria-label="Wishlist">
-              <Heart size={20} />
-            </button>
-            <Link href="/cart" className="p-2 hover:bg-gray-100 rounded-full relative" aria-label={`Cart with ${cartItemCount} items`}>
-              <ShoppingBag size={20} />
-              {cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 bg-rose-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
-          </div>
-
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <button className="p-2 hover:bg-gray-100 rounded-full" aria-label="Open menu">
-                  <Menu size={20} />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="bg-white/80 backdrop-blur-md">
-                <div className="flex justify-end">
-                  <SheetClose asChild>
-                    <button className="p-2 hover:bg-gray-200 rounded-full" aria-label="Close menu">
-                      <X size={20} />
-                    </button>
-                  </SheetClose>
-                </div>
-                <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
-                <nav className="flex flex-col gap-6 mt-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="shop">
-                      <AccordionTrigger className="text-rose-600 hover:no-underline">Shop</AccordionTrigger>
-                      <AccordionContent>
-                        <Accordion type="single" collapsible className="pl-4">
-                          {Object.values(productData.categories).map((category) => (
-                            <AccordionItem key={category.id} value={category.id}>
-                              <AccordionTrigger className="text-sm font-medium text-rose-600 hover:no-underline">
-                                {category.name}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                <div className="flex flex-col gap-2">
-                                  {Object.entries(category.collections).map(([collectionId, collection]) => (
-                                    <Link
-                                      key={collectionId}
-                                      href={`/category/${category.id}/${collectionId}`}
-                                      className="py-1 text-xs text-gray-600 hover:text-rose-600"
-                                    >
-                                      {collection.name}
-                                    </Link>
-                                  ))}
+            {/* Desktop Right Icons */}
+            <div className="flex items-center space-x-4">
+              <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <DialogTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
+                      <Search className="h-5 w-5 text-gray-900" />
+                    </Button>
+                  </motion.div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <VisuallyHidden>
+                    <DialogTitle>Search Products</DialogTitle>
+                  </VisuallyHidden>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="flex items-center border-b border-gray-200">
+                      <Search className="h-5 w-5 text-gray-400 mx-2" />
+                      <Input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="border-0 focus:ring-0"
+                        autoFocus
+                      />
+                      {searchQuery && (
+                        <Button variant="ghost" size="icon" onClick={resetSearch}>
+                          <X className="h-5 w-5 text-gray-400" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {searchLoading ? (
+                        <p className="text-center text-gray-600 py-4">Searching...</p>
+                      ) : searchData?.results.length ? (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {searchData.results.map((product, index) => (
+                            <motion.div
+                              key={product.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2, delay: index * 0.05 }}
+                            >
+                              <Link
+                                href={`/product/${product.slug}`}
+                                className="flex items-center p-2 hover:bg-gray-100 transition-colors duration-200"
+                                onClick={resetSearch}
+                              >
+                                <Image
+                                  src={product.images[0]}
+                                  alt={product.name}
+                                  width={40}
+                                  height={40}
+                                  className="object-contain mr-2 rounded"
+                                />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    ${Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
+                                  </p>
                                 </div>
-                              </AccordionContent>
-                            </AccordionItem>
+                              </Link>
+                            </motion.div>
                           ))}
-                        </Accordion>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="best-sellers">
-                      <AccordionTrigger className="text-rose-600 hover:no-underline">Best Sellers</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="flex flex-col gap-2 pl-4">
-                          {productData.productReferences.bestSellers.map((productId) => (
-                            <Link
-                              key={productId}
-                              href={`/product/${productData.products[productId].slug}`}
-                              className="py-1 text-xs text-gray-600 hover:text-rose-600"
-                            >
-                              {productData.products[productId].name}
-                            </Link>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="new-arrivals">
-                      <AccordionTrigger className="text-rose-600 hover:no-underline">New Arrivals</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="flex flex-col gap-2 pl-4">
-                          {productData.productReferences.featured.map((item) => (
-                            <Link
-                              key={item}
-                              href={`/product/${productData.products[item].slug}`}
-                              className="py-1 text-xs text-gray-700 hover:text-rose-600"
-                            >
-                              {productData.products[item].name}
-                            </Link>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="about">
-                      <AccordionTrigger className="text-rose-600 hover:no-underline">About</AccordionTrigger>
-                      <AccordionContent>
-                        <Link href="/about" className="py-1 text-xs text-gray-600 hover:text-rose-600">
-                          About Star Cosmetics
-                        </Link>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+                        </motion.div>
+                      ) : searchQuery.trim().length >= 2 ? (
+                        <p className="text-center text-gray-600 py-4">No results found</p>
+                      ) : null}
+                    </div>
+                  </motion.div>
+                </DialogContent>
+              </Dialog>
 
-      {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 border-t border-gray-200 z-50">
-          <div className="flex justify-around p-3">
-            <Sheet onOpenChange={(open) => {
-              setIsSearchOpen(open);
-              if (!open) resetSearch();
-            }}>
-              <SheetTrigger asChild>
-                <button className={getButtonClass('/search')} aria-label="Search">
-                  <Search size={20} className={getIconClass('/search')} />
-                  <span className="text-xs">Search</span>
-                  {isSearchOpen && (
-                    <span className="absolute bottom-0 w-6 h-0.5 bg-rose-500 rounded-full" />
-                  )}
-                </button>
-              </SheetTrigger>
-              <SheetContent side="top" className="bg-white/80 backdrop-blur-md p-6">
-                <SheetTitle className="sr-only">Search Products</SheetTitle>
-                <div className="flex items-center gap-2 mb-4">
-                  <Search size={24} className="text-rose-600" />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full p-2 text-gray-900 bg-transparent border-b border-gray-200 focus:outline-none focus:border-rose-600"
-                    autoFocus
-                  />
-                  <SheetClose asChild>
-                    <button className="p-2 hover:bg-gray-100 rounded-full" aria-label="Close search">
-                      <X size={20} />
-                    </button>
-                  </SheetClose>
-                </div>
-                <div className="max-h-[70vh] overflow-y-auto">
-                  {isLoading && <p className="text-rose-600 text-sm">Loading...</p>}
-                  {error && (
-                    <p className="text-red-500 text-sm">Failed to fetch search results. Please try again.</p>
-                  )}
-                  {!isLoading && !error && data?.results.length === 0 && searchQuery.length >= 2 && (
-                    <p className="text-rose-600 text-sm">No products found.</p>
-                  )}
-                  {!isLoading && !error && data?.results.length > 0 && (
-                    <ul className="grid gap-4">
-                      {data.results.map((product: SearchResult) => (
-                        <li key={product.id} className="flex items-center gap-4 p-3 hover:bg-rose-100 rounded-md">
-                          <Link href={`/product/${product.slug}`} className="flex gap-4 w-full">
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              width={80}
-                              height={80}
-                              className="object-cover rounded-md"
-                            />
-                            <div>
-                              <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
-                              <p className="text-xs text-gray-600">{product.shortDescription}</p>
-                              <p className="text-xs text-rose-600">
-                                {product.variants[0]?.price ? `$${product.variants[0].price.toFixed(2)}` : 'Price unavailable'}
-                              </p>
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-            <Link href="/account" className={getButtonClass('/account')} aria-label="Account">
-              <User size={20} className={getIconClass('/account')} />
-              <span className="text-xs">Account</span>
-              {pathname === '/account' && (
-                <span className="absolute bottom-0 w-6 h-0.5 bg-rose-500 rounded-full" />
+              {/* Desktop Wishlist & Cart - Hidden on Mobile */}
+              <div className="hidden md:flex items-center space-x-4">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/wishlist" className="relative">
+                    <Heart className="h-5 w-5 text-gray-900" />
+                    {wishlistItems.length > 0 && (
+                      <motion.span
+                        className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      >
+                        {wishlistItems.length}
+                      </motion.span>
+                    )}
+                  </Link>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/cart" className="relative">
+                    <ShoppingCart className="h-5 w-5 text-gray-900" />
+                    {cartItemCount > 0 && (
+                      <motion.span
+                        className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      >
+                        {cartItemCount}
+                      </motion.span>
+                    )}
+                  </Link>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Link href="/account">
+                    <User className="h-5 w-5 text-gray-900" />
+                  </Link>
+                </motion.div>
+              </div>
+
+              {/* Mobile Menu Trigger */}
+              {isMobile && (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Button variant="ghost" size="icon">
+                        <Menu className="h-5 w-5 text-gray-900" />
+                      </Button>
+                    </motion.div>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[300px]">
+                    <VisuallyHidden>
+                      <SheetTitle>Menu</SheetTitle>
+                    </VisuallyHidden>
+                    <SheetClose className="absolute right-4 top-4">
+                      <X className="h-5 w-5" />
+                    </SheetClose>
+                    <motion.div
+                      className="mt-8"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="categories">
+                          <AccordionTrigger>Categories</AccordionTrigger>
+                          <AccordionContent>
+                            {categoriesLoading
+                              ? <div className="py-4">Loading...</div>
+                              : categories?.map((category) => (
+                                  <div key={category.id} className="ml-4 mb-4">
+                                    <p className="font-medium text-gray-900 mb-2">{category.name}</p>
+                                    <ul className="space-y-2">
+                                      {category.collections.map((collection) => (
+                                        <li key={collection.id}>
+                                          <Link
+                                            href={`/shop?category=${category.id}&collection=${collection.id}`}
+                                            className="text-sm text-gray-600 hover:text-yellow-400 transition-colors duration-200"
+                                            onClick={() => document.querySelector('[data-state="open"]')?.click()}
+                                          >
+                                            {collection.name}
+                                          </Link>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ))}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                      <Link 
+                        href="/shop" 
+                        className="block py-3 text-gray-900 hover:text-yellow-400 transition-colors duration-200 border-t border-gray-200 mt-4"
+                      >
+                        Shop
+                      </Link>
+                    </motion.div>
+                  </SheetContent>
+                </Sheet>
               )}
-            </Link>
-            <Link href="/wishlist" className={getButtonClass('/wishlist')} aria-label="Wishlist">
-              <Heart size={20} className={getIconClass('/wishlist')} />
-              <span className="text-xs">Wishlist</span>
-              {pathname === '/wishlist' && (
-                <span className="absolute bottom-0 w-6 h-0.5 bg-rose-500 rounded-full" />
-              )}
-            </Link>
-            <Link href="/cart" className={getButtonClass('/cart')} aria-label={`Cart with ${cartItemCount} items`}>
-              <ShoppingBag size={20} className={getIconClass('/cart')} />
-              <span className="text-xs">Cart</span>
-              {cartItemCount > 0 && (
-                <span className="absolute top-0 right-0 bg-rose-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-              {pathname === '/cart' && (
-                <span className="absolute bottom-0 w-6 h-0.5 bg-rose-500 rounded-full" />
-              )}
-            </Link>
+            </div>
           </div>
         </div>
-      )}
+      </motion.header>
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNavigation />
+      
+      {/* Mobile Bottom Padding */}
+      <div className="md:hidden h-20" />
     </>
   );
 }

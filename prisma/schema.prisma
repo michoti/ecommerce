@@ -8,28 +8,234 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+}
+
+enum ShippingMethod {
+  FLAT
+  EXPRESS
+  OVERNIGHT
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
 model User {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  carts     Cart[]
+  id                String            @id // Clerk user ID (e.g., user_xxx)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  carts             Cart[]
+  orders            Order[]
+  shippingAddresses ShippingAddress[]
+  billingAddresses  BillingAddress[]
+
+  @@index([id])
 }
 
 model Cart {
   id        String     @id @default(cuid())
-  userId    String?
+  userId    String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   items     CartItem[]
-  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model CartItem {
   id        String   @id @default(cuid())
   cartId    String
   variantId String
-  quantity  Int
+  quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant   Variant  @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@index([cartId, variantId])
+}
+
+model Category {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  collections Collection[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([name])
+}
+
+model Collection {
+  id         String    @id @default(cuid())
+  name       String
+  categoryId String
+  products   Product[] @relation("CollectionProducts")
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([categoryId])
+}
+
+model Product {
+  id               String       @id @default(cuid())
+  name             String
+  slug             String       @unique
+  shortDescription String
+  longDescription  String?
+  finish           String?
+  coverage         String?
+  avgRating        Float        @default(0)
+  images           String[]
+  variants         Variant[]
+  reviews          Review[]
+  collections      Collection[] @relation("CollectionProducts")
+  orders           OrderItem[]  @relation("ProductOrders")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([slug])
+  @@index([name])
+}
+
+model Variant {
+  id         String      @id @default(cuid())
+  productId  String
+  shade      String?
+  size       String?
+  price      Decimal     @default(0.00)
+  sku        String      @unique
+  stock      Int         @default(0)
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  rating    Float    @default(0)
+  comment   String?
+  reviewer  String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model Order {
+  id                String          @id @default(cuid())
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shippingAddressId String
+  billingAddressId  String?
+  shippingAddress   ShippingAddress @relation(fields: [shippingAddressId], references: [id], onDelete: Restrict)
+  billingAddress    BillingAddress? @relation(fields: [billingAddressId], references: [id], onDelete: Restrict)
+  shippingMethod    ShippingMethod
+  shippingCost      Decimal         @default(0.00)
+  paymentMethod     PaymentMethod
+  subtotal          Decimal         @default(0.00)
+  total             Decimal         @default(0.00)
+  status            OrderStatus     @default(PENDING)
+  couponCode        String?
+  giftOption        String?
+  additionalNotes   String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  orderItems        OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  variantId String
+  quantity  Int      @default(1)
+  price     Decimal  @default(0.00)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation("ProductOrders", fields: [productId], references: [id], onDelete: Restrict)
+  variant   Variant  @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId, variantId])
+  @@index([productId])
+}
+
+model ShippingAddress {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  firstName String
+  lastName  String
+  company   String?
+  address   String
+  apartment String?
+  city      String
+  state     String?
+  zipCode   String
+  country   String
+  phone     String?
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model BillingAddress {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  firstName String
+  lastName  String
+  company   String?
+  address   String
+  apartment String?
+  city      String
+  state     String?
+  zipCode   String
+  country   String
+  phone     String?
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Coupon {
+  id         String     @id @default(cuid())
+  code       String     @unique
+  discount   Decimal    @default(0.00)
+  type       CouponType
+  validFrom  DateTime
+  validUntil DateTime?
+  maxUses    Int?
+  usedCount  Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([code])
 }

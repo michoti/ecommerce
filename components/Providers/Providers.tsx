@@ -15,7 +15,7 @@ export default function Providers({
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
       {children}
-         <Toaster />
+         <Toaster richColors />
       </NuqsAdapter>
     </QueryClientProvider>
   );

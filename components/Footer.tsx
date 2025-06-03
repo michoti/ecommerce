@@ -1,211 +1,213 @@
-import Link from "next/link";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
-import { productData } from "@/lib/data";
+import Link from "next/link";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Footer() {
-
   return (
-    <footer className="bg-white pt-16 pb-8 border-t border-gray-100">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+    <footer className="bg-white border-t border-gray-100 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Accordion type="single" collapsible className="md:hidden">
+          <AccordionItem value="brand">
+            <AccordionTrigger className="text-[#4d0000] font-medium">Star Cosmetics</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-gray-600 mb-4">Luxury beauty products crafted with care.</p>
+              <div className="flex gap-3">
+                <Link
+                  href="https://facebook.com/stiscosmetics"
+                  className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={18} className="text-[#990000]" />
+                </Link>
+                <Link
+                  href="https://twitter.com/stiscosmetics"
+                  className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                  aria-label="Twitter"
+                >
+                  <Twitter size={18} className="text-[#990000]" />
+                </Link>
+                <Link
+                  href="https://instagram.com/stiscosmetics"
+                  className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                  aria-label="Instagram"
+                >
+                  <Instagram size={18} className="text-[#990000]" />
+                </Link>
+                <Link
+                  href="https://youtube.com/stiscosmetics"
+                  className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                  aria-label="YouTube"
+                >
+                  <Youtube size={18} className="text-[#990000]" />
+                </Link>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="shop">
+            <AccordionTrigger className="text-[#4d0000] font-medium">Shop</AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/products/featured" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Featured
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/products/best-sellers" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Best Sellers
+                  </Link>
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="help">
+            <AccordionTrigger className="text-[#4d0000] font-medium">Help</AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/contact" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faqs" className="text-gray-600 hover:text-[#ff4d4d]">
+                    FAQs
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/shipping-returns" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Shipping & Returns
+                  </Link>
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="about">
+            <AccordionTrigger className="text-[#4d0000] font-medium">About</AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/about/our-story" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Our Story
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about/sustainability" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Sustainability
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/about/careers" className="text-gray-600 hover:text-[#ff4d4d]">
+                    Careers
+                  </Link>
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div>
-            <h3 className="text-lg font-medium mb-4 text-rose-900">STAR COSMETICS</h3>
-            <p className="text-gray-600 mb-6">
-              Luxury beauty products crafted with care for the modern individual.
-            </p>
-            <div className="flex gap-4">
+            <h3 className="text-lg font-medium mb-4 text-[#4d0000]">Star Cosmetics</h3>
+            <p className="text-gray-600 mb-4">Luxury beauty products crafted with care.</p>
+            <div className="flex gap-3">
               <Link
                 href="https://facebook.com/stiscosmetics"
-                className="p-2 bg-rose-50 rounded-full hover:bg-rose-100 transition-colors"
-                aria-label="Visit our Facebook page"
+                className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                aria-label="Facebook"
               >
-                <Facebook size={20} className="text-rose-800" />
+                <Facebook size={18} className="text-[#990000]" />
               </Link>
               <Link
                 href="https://twitter.com/stiscosmetics"
-                className="p-2 bg-rose-50 rounded-full hover:bg-rose-100 transition-colors"
-                aria-label="Visit our Twitter page"
+                className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                aria-label="Twitter"
               >
-                <Twitter size={20} className="text-rose-800" />
+                <Twitter size={18} className="text-[#990000]" />
               </Link>
               <Link
                 href="https://instagram.com/stiscosmetics"
-                className="p-2 bg-rose-50 rounded-full hover:bg-rose-100 transition-colors"
-                aria-label="Visit our Instagram page"
+                className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                aria-label="Instagram"
               >
-                <Instagram size={20} className="text-rose-800" />
+                <Instagram size={18} className="text-[#990000]" />
               </Link>
               <Link
                 href="https://youtube.com/stiscosmetics"
-                className="p-2 bg-rose-50 rounded-full hover:bg-rose-100 transition-colors"
-                aria-label="Visit our YouTube channel"
+                className="p-2 bg-[#ff4d4d]/10 rounded-full hover:bg-[#ff4d4d]/20"
+                aria-label="YouTube"
               >
-                <Youtube size={20} className="text-rose-800" />
+                <Youtube size={18} className="text-[#990000]" />
               </Link>
             </div>
           </div>
-
           <div>
-            <h3 className="text-lg font-medium mb-4 text-rose-900">Shop</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-medium mb-4 text-[#4d0000]">Shop</h3>
+            <ul className="space-y-2">
               <li>
-                <Link
-                  href="/products/featured"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/products/featured" className="text-gray-600 hover:text-[#ff4d4d]">
                   Featured
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/products/best-sellers"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/products/best-sellers" className="text-gray-600 hover:text-[#ff4d4d]">
                   Best Sellers
                 </Link>
               </li>
-              {Object.values(productData.categories).map((category) => (
-                <li key={category.id}>
-                  <Link
-                    href={`/products/${category.id}`}
-                    className="text-gray-600 hover:text-rose-800 transition-colors"
-                  >
-                    {category.name}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
-
           <div>
-            <h3 className="text-lg font-medium mb-4 text-rose-900">Help</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-medium mb-4 text-[#4d0000]">Help</h3>
+            <ul className="space-y-2">
               <li>
-                <Link
-                  href="/contact"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/contact" className="text-gray-600 hover:text-[#ff4d4d]">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link href="/faqs" className="text-gray-600 hover:text-rose-800 transition-colors">
+                <Link href="/faqs" className="text-gray-600 hover:text-[#ff4d4d]">
                   FAQs
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/shipping-returns"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/shipping-returns" className="text-gray-600 hover:text-[#ff4d4d]">
                   Shipping & Returns
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/track-order"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
-                  Track Order
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy-policy"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms-conditions"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
-                  Terms & Conditions
                 </Link>
               </li>
             </ul>
           </div>
-
           <div>
-            <h3 className="text-lg font-medium mb-4 text-rose-900">About</h3>
-            <ul className="space-y-3">
+            <h3 className="text-lg font-medium mb-4 text-[#4d0000]">About</h3>
+            <ul className="space-y-2">
               <li>
-                <Link
-                  href="/about/our-story"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/about/our-story" className="text-gray-600 hover:text-[#ff4d4d]">
                   Our Story
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/about/sustainability"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/about/sustainability" className="text-gray-600 hover:text-[#ff4d4d]">
                   Sustainability
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/about/careers"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
+                <Link href="/about/careers" className="text-gray-600 hover:text-[#ff4d4d]">
                   Careers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about/press"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
-                  Press
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-gray-600 hover:text-rose-800 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/store-locator"
-                  className="text-gray-600 hover:text-rose-800 transition-colors"
-                >
-                  Store Locator
                 </Link>
               </li>
             </ul>
           </div>
         </div>
-
-        <div className="border-t border-gray-100 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">© 2025 STAR COSMETICS. All rights reserved.</p>
-            <div className="flex gap-6">
-              <Link
-                href="/privacy-policy"
-                className="text-gray-500 text-sm hover:text-rose-800 transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms-of-service"
-                className="text-gray-500 text-sm hover:text-rose-800 transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/accessibility"
-                className="text-gray-500 text-sm hover:text-rose-800 transition-colors"
-              >
-                Accessibility
-              </Link>
-            </div>
-            <div className="text-gray-500 text-sm">
-              We accept: Visa, MasterCard, PayPal, Amex
-            </div>
+        <div className="border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
+          <p>© 2025 Star Cosmetics. All rights reserved.</p>
+          <div className="flex justify-center gap-4 mt-2">
+            <Link href="/privacy-policy" className="hover:text-[#ff4d4d]">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-[#ff4d4d]">
+              Terms
+            </Link>
+            <Link href="/accessibility" className="hover:text-[#ff4d4d]">
+              Accessibility
+            </Link>
           </div>
         </div>
       </div>

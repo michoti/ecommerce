@@ -5,15 +5,18 @@ import { useCartStore } from './cart.store';
 import { toast } from 'sonner';
 
 export const useCartMerge = () => {
-  const { userId } = useAuth();
+    // const { userId } = useAuth();
+    const userId = null;
   const mergeCartMutation = useMergeCartMutation();
   const cart = useCartStore((state) => state.cart);
+
+  console.log("this is the cart from the useCartMerge fxn :", cart)
 
   useEffect(() => {
     const clearExpiredCart = () => {
       if (!cart || cart.id !== 'local') return;
       const lastUpdated = new Date(cart.updatedAt);
-      const now = new Date('2025-05-30T14:39:00Z'); // 05:39 PM EAT
+      const now = new Date(); 
       const hoursDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
       if (hoursDiff > 24) {
         useCartStore.getState().clearCart();
@@ -24,6 +27,7 @@ export const useCartMerge = () => {
     clearExpiredCart();
 
     if (userId && cart && cart.id === 'local' && cart.items.length > 0) {
+      console.log("Cart merging in useCartMerge hook !!!");
       mergeCartMutation.mutate(
         cart.items.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
         {

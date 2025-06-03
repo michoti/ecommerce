@@ -24,8 +24,11 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = ({ product, index }) => {
   const router = useRouter();
 
+  console.log(" this is my product :", product.slug)
+
   // Handle click to navigate to product details using slug
   const handleClick = () => {
+    console.log("### slug before product click :", product);
     router.push(`/products/${product.slug}`);
   };
 
@@ -49,11 +52,11 @@ const ProductCard: FC<ProductCardProps> = ({ product, index }) => {
         />
       </div>
       <div className="text-center">
-        <p className="text-xs text-gray-500 mb-1">
+        <p className="text-xs text-gray-600 mb-1">
           {product.finish || product.coverage || 'Product'}
         </p>
-        <h3 className="font-medium text-rose-900">{product.name}</h3>
-        <p className="text-gray-700">
+        <h3 className="font-medium text-[#4d0000]">{product.name}</h3>
+        <p className="text-[#990000]">
           ${Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
         </p>
       </div>
