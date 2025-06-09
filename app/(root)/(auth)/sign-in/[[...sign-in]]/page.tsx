@@ -1,217 +1,308 @@
 "use client";
 
-import * as Clerk from "@clerk/elements/common";
-import * as SignIn from "@clerk/elements/sign-in";
-import { useUser } from "@clerk/nextjs";
-import { login, logout } from "@/lib/features/authSlice";
-import { AppDispatch, useAppSelector } from "@/lib/store";
-import { useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import AuthLayout from "@/components/AuthLayout";
+// import * as Clerk from "@clerk/elements/common";
+// import * as SignIn from "@clerk/elements/sign-in";
 import Link from "next/link";
-import { Label } from "@/components/ui/label";
-import { Chrome } from "lucide-react"; // Replaced FaGoogle with Chrome
+import { Chrome, Eye, EyeOff } from "lucide-react";
+import AuthLayout from "@/components/AuthLayout";
+import { useState } from "react";
+import { SignIn } from "@clerk/nextjs";
 
 const SignInPage = () => {
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const authStatus = useAppSelector((state) => state.auth.status);
-  const [loading, setLoading] = useState(true);
-  const { isSignedIn, user, isLoaded } = useUser();
+  const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    if (!isLoaded) return;
+  const inputClassName = "w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 transition-colors";
+  
+  const buttonClassName = "relative flex justify-center items-center h-12 w-full text-sm font-medium tracking-tight overflow-hidden rounded-md bg-neutral-900 px-4 py-2.5 text-white transition-all duration-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
-    if (isSignedIn && user) {
-      dispatch(
-        login({
-          $id: user.id,
-          email: user.emailAddresses[0].emailAddress,
-          firstName: user.firstName || undefined,
-        })
-      );
-    } else {
-      dispatch(logout());
-    }
-    setLoading(false);
-  }, [isSignedIn, user, isLoaded, dispatch]);
+  const linkButtonClassName = "text-sm text-gray-600 hover:text-gray-900 underline-offset-4 hover:underline focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 rounded";
 
   return (
-    <AuthLayout authentication={true}>
-      {loading || !isLoaded ? (
-        <div className="flex py-16 items-center justify-center px-4">
-          <p>Loading...</p>
-        </div>
-      ) : isSignedIn && authStatus ? (
-        <div className="flex py-16 items-center justify-center px-4">
-          <div className="mx-auto text-gray-700 w-full max-w-[500px]">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-normal font-geist tracking-tighter">
-                Welcome back
-              </h1>
-              <p className="text-gray-800/90">
-                You're signed in successfully
-              </p>
-              <Link href="/products">
-                <button className="mt-6 relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2">
-                  Continue Shopping
-                </button>
-              </Link>
-            </div>
+    <AuthLayout authentication={false}>
+      <div className="flex min-h-screen py-16 relative items-center justify-center px-4">
+        <div className="mx-auto z-10 w-full max-w-md">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+              Welcome back
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Sign in to your account to continue
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="flex py-16 relative items-center justify-center px-4">
-          <div className="mx-auto z-10 text-gray-700 w-full max-w-[500px]">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-normal font-geist tracking-tighter">
-                Welcome back
-              </h1>
-              <p className="text-gray-800/90 font-geist font-normal">
-                Sign in to your account to continue
-              </p>
-            </div>
+          <SignIn />
 
-            <SignIn.Root>
-              {/* Email/Username Input */}
-              <SignIn.Step name="start">
-                <Clerk.Field name="identifier" className="space-y-5">
-                  <div>
-                    <Label htmlFor="identifier">Email</Label>
-                    <Clerk.Input
-                      className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                      placeholder="Enter your email"
-                    />
-                    <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                  </div>
-                  <SignIn.Action
-                    submit
-                    className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                  >
-                    Sign in
-                  </SignIn.Action>
-                </Clerk.Field>
-              </SignIn.Step>
-
-              {/* Password Input */}
-              <SignIn.Step name="verifications">
-                <SignIn.Strategy name="password">
-                  <Clerk.Field name="password" className="space-y-5">
-                    <div>
-                      <Label htmlFor="password">Password</Label>
-                      <Clerk.Input
-                        className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                        placeholder="Enter your password"
-                      />
-                      <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                    </div>
-                    <div className="space-y-4">
-                      <SignIn.Action
-                        submit
-                        className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                      >
-                        Continue
-                      </SignIn.Action>
-                      <SignIn.Action
-                        navigate="forgot-password"
-                        className="block text-center text-sm text-gray-600 hover:underline"
-                      >
-                        Forgot Password?
-                      </SignIn.Action>
-                    </div>
-                  </Clerk.Field>
-                </SignIn.Strategy>
-
-                {/* Password Reset Code */}
-                <SignIn.Strategy name="reset_password_email_code">
-                  <div className="space-y-5">
-                    <p className="text-sm text-gray-600">
-                      We sent a code to <SignIn.SafeIdentifier />.
-                    </p>
-                    <Clerk.Field name="code">
-                      <Clerk.Input
-                        className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                        placeholder="Verification Code"
-                      />
-                      <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                    </Clerk.Field>
-                    <SignIn.Action
-                      submit
-                      className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                    >
-                      Continue
-                    </SignIn.Action>
-                  </div>
-                </SignIn.Strategy>
-              </SignIn.Step>
-
-              {/* Forgot Password */}
-              <SignIn.Step name="forgot-password">
-                <SignIn.SupportedStrategy name="reset_password_email_code">
-                  <SignIn.Action
-                    submit
-                    className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                  >
-                    Reset Password
-                  </SignIn.Action>
-                </SignIn.SupportedStrategy>
-                <SignIn.Action
-                  navigate="previous"
-                  className="block text-center text-sm text-gray-600 hover:underline mt-4"
-                >
-                  Go back
-                </SignIn.Action>
-              </SignIn.Step>
-
-              {/* Reset Password */}
-              <SignIn.Step name="reset-password" className="space-y-5">
-                <h1 className="text-2xl font-normal font-geist tracking-tighter">
-                  Reset your password
-                </h1>
-                <Clerk.Field name="password">
-                  <Label>New password</Label>
-                  <Clerk.Input className="w-full rounded border border-gray-300 px-3 py-2 text-black" />
-                  <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                </Clerk.Field>
-                <Clerk.Field name="confirmPassword">
-                  <Label>Confirm password</Label>
-                  <Clerk.Input className="w-full rounded border border-gray-300 px-3 py-2 text-black" />
-                  <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                </Clerk.Field>
-                <SignIn.Action
-                  submit
-                  className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                >
-                  Reset Password
-                </SignIn.Action>
-              </SignIn.Step>
-            </SignIn.Root>
-
-            {/* Google Sign-in and Sign-up Link */}
-            <div className="mt-6 text-center text-sm">
-              <p className="text-gray-500">
-                Don't have an account?
-                <Link
-                  className="font-medium text-gray-900 underline-offset-4 hover:underline ml-2"
-                  href="/sign-up"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div>
-            <div className="mt-6 border-t pt-6">
+          {/* <SignIn.Root> */}
+          
+            {/* <SignIn.Step name="start">
+             
               <Clerk.Connection
                 name="google"
-                className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
+                className="relative flex justify-center items-center h-12 w-full text-sm font-medium tracking-tight overflow-hidden rounded-md border border-gray-300 bg-white px-4 py-2.5 text-gray-700 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2"
               >
-                <Chrome className="text-white mr-2 h-4 w-4" /> {/* Replaced FaGoogle with Chrome */}
-                Sign in with Google
+                <Clerk.Icon  className="p-4"/>
+                Continue with Google
               </Clerk.Connection>
-            </div>
-          </div>
+
+           
+              <div className="mt-8 mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+               
+                <Clerk.Field name="identifier" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    Email or username
+                  </Clerk.Label>
+                  <Clerk.Input
+                    type="text"
+                    autoComplete="username"
+                    className={inputClassName}
+                    placeholder="Enter your email or username"
+                  />
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+               
+                <SignIn.Action submit className={buttonClassName}>
+                  Continue
+                </SignIn.Action>
+              </div>
+            </SignIn.Step> */}
+
+            {/* Verification Steps */}
+            {/* <SignIn.Step name="verifications">
+              
+            
+              <SignIn.Strategy name="email_code">
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                      Check your email
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      We sent a verification code to <SignIn.SafeIdentifier />. Please enter it below.
+                    </p>
+                  </div>
+                  
+                  <Clerk.Field name="code" className="space-y-2">
+                    <Clerk.Label className="text-sm font-medium text-gray-700">
+                      Email code
+                    </Clerk.Label>
+                    <Clerk.Input
+                      type="text"
+                      autoComplete="one-time-code"
+                      className={inputClassName}
+                      placeholder="Enter 6-digit code"
+                      maxLength={6}
+                    />
+                    <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                  </Clerk.Field>
+                  
+                  <SignIn.Action submit className={buttonClassName}>
+                    Continue
+                  </SignIn.Action>
+                  
+                  <div className="text-center">
+                    <SignIn.Action resend className={linkButtonClassName}>
+                      Didn't receive the code? Resend
+                    </SignIn.Action>
+                  </div>
+                </div>
+              </SignIn.Strategy>
+
+             
+              <SignIn.Strategy name="password">
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                      Enter your password
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      Welcome back! Please enter your password for <SignIn.SafeIdentifier />.
+                    </p>
+                  </div>
+
+                  <Clerk.Field name="password" className="space-y-2">
+                    <Clerk.Label className="text-sm font-medium text-gray-700">
+                      Password
+                    </Clerk.Label>
+                    <div className="relative">
+                      <Clerk.Input
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        className={`${inputClassName} pr-10`}
+                        placeholder="Enter your password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                    <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                  </Clerk.Field>
+
+                  <SignIn.Action submit className={buttonClassName}>
+                    Sign in
+                  </SignIn.Action>
+
+                  
+                  <div className="text-center">
+                    <SignIn.Action navigate="forgot-password" className={linkButtonClassName}>
+                      Forgot password?
+                    </SignIn.Action>
+                  </div>
+                </div>
+              </SignIn.Strategy>
+
+             
+              <SignIn.Strategy name="reset_password_email_code">
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                      Check your email
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      We sent a password reset code to <SignIn.SafeIdentifier />. Please enter it below.
+                    </p>
+                  </div>
+                  
+                  <Clerk.Field name="code" className="space-y-2">
+                    <Clerk.Label className="text-sm font-medium text-gray-700">
+                      Reset code
+                    </Clerk.Label>
+                    <Clerk.Input
+                      type="text"
+                      autoComplete="one-time-code"
+                      className={inputClassName}
+                      placeholder="Enter 6-digit code"
+                      maxLength={6}
+                    />
+                    <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                  </Clerk.Field>
+                  
+                  <SignIn.Action submit className={buttonClassName}>
+                    Continue
+                  </SignIn.Action>
+
+                
+                  <div className="text-center">
+                    <SignIn.Action resend className={linkButtonClassName}>
+                      Didn't receive the code? Resend
+                    </SignIn.Action>
+                  </div>
+                </div>
+              </SignIn.Strategy>
+            </SignIn.Step> */}
+
+            {/* Forgot Password Step */}
+            {/* <SignIn.Step name="forgot-password">
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Forgot your password?
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    No worries! We'll send you a reset link.
+                  </p>
+                </div>
+
+                <SignIn.SupportedStrategy name="reset_password_email_code">
+                  Reset password
+                </SignIn.SupportedStrategy>
+
+                <div className="text-center">
+                  <SignIn.Action navigate="previous" className={linkButtonClassName}>
+                    Go back
+                  </SignIn.Action>
+                </div>
+              </div>
+            </SignIn.Step> */}
+
+            {/* Reset Password Step */}
+            {/* <SignIn.Step name="reset-password">
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    Reset your password
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Please enter your new password below.
+                  </p>
+                </div>
+
+                <Clerk.Field name="password" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    New password
+                  </Clerk.Label>
+                  <div className="relative">
+                    <Clerk.Input
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className={`${inputClassName} pr-10`}
+                      placeholder="Enter your new password"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+                <Clerk.Field name="confirmPassword" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    Confirm password
+                  </Clerk.Label>
+                  <Clerk.Input
+                    type="password"
+                    autoComplete="new-password"
+                    className={inputClassName}
+                    placeholder="Confirm your new password"
+                  />
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+                <SignIn.Action submit className={buttonClassName}>
+                  Reset password
+                </SignIn.Action>
+              </div>
+            </SignIn.Step> */}
+
+            {/* Sign-up link */}
+            {/* <div className="mt-6 text-center text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link href="/sign-up" className="font-medium text-neutral-900 hover:underline">
+                Sign up
+              </Link>
+            </div> */}
+          {/* </SignIn.Root> */}
         </div>
-      )}
+      </div>
     </AuthLayout>
   );
 };

@@ -5,7 +5,6 @@ import {
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
@@ -28,9 +27,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useWishlistStore } from '@/lib/modules/wishlist/wishlist.store';
 import { useCartStore } from '@/lib/modules/cart/cart.store';
+import { UserButton, useAuth, useUser } from '@clerk/nextjs';
+import { useAuthStore } from '@/lib/auth.store';
 
 const fetchCategories = async (): Promise<Category[]> => {
-  const response = await fetch('/api/search');
+  // Fetch all products to extract categories and collections
+  const response = await fetch('/api/search'); // Use high limit to get all products
   if (!response.ok) throw new Error('Failed to fetch categories');
   const { results } = await response.json();
   const categories = new Map<string, Category>();
@@ -42,9 +44,7 @@ const fetchCategories = async (): Promise<Category[]> => {
       }
       const cat = categories.get(category.id)!;
       if (!cat.collections.some((c) => c.id === collection.id)) {
-        cat.collections.push({ id: collection.id, name: collection.name, products: [product] });
-      } else {
-        cat.collections.find((c) => c.id === collection.id)!.products.push(product);
+        cat.collections.push({ id: collection.id, name: collection.name });
       }
     });
   });
@@ -52,10 +52,35 @@ const fetchCategories = async (): Promise<Category[]> => {
 };
 
 const fetchSearchResults = async (query: string): Promise<SearchResponse> => {
-  if (query.trim().length < 2) return { results: [], count: 0, lastUpdated: '' };
+  if (query.trim().length < 2) return { results: [], count: 0, totalCount: 0, page: 1, limit: 20, totalPages: 0, hasNextPage: false, hasPrevPage: false, lastUpdated: '' };
   const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
   if (!response.ok) throw new Error('Failed to fetch search results');
   return response.json();
+};
+
+// Authentication Hook for consistent state management
+const useAuthenticationState = () => {
+  const { userId, isLoaded: clerkLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
+  const { setAuthState, clearAuthState, isLoading: authStoreLoading } = useAuthStore();
+
+  // Sync Clerk auth state with Zustand store
+  useEffect(() => {
+    if (clerkLoaded) {
+      if (isSignedIn && userId) {
+        setAuthState(userId);
+      } else {
+        clearAuthState();
+      }
+    }
+  }, [clerkLoaded, isSignedIn, userId, setAuthState, clearAuthState]);
+
+  return {
+    isAuthenticated: isSignedIn || false,
+    isLoading: !clerkLoaded || authStoreLoading,
+    userId,
+    user,
+  };
 };
 
 // Bottom Navigation Component
@@ -65,13 +90,30 @@ const BottomNavigation = () => {
   const cartState = useCartStore((state) => state.cart);
   const wishlistItems = useWishlistStore((state) => state.items);
   const cartItemCount = getCartItemCount(cart || cartState);
+  const { isAuthenticated, isLoading } = useAuthenticationState();
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
     { href: '/wishlist', icon: Heart, label: 'Wishlist', badge: wishlistItems.length },
     { href: '/cart', icon: ShoppingCart, label: 'Cart', badge: cartItemCount },
-    { href: '/account', icon: User, label: 'Account' },
+    {
+      href: isAuthenticated ? '/account' : '/sign-in',
+      icon: User,
+      label: isAuthenticated ? 'Account' : 'Sign In',
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+        <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+          <div className="flex items-center justify-center px-4 py-4">
+            <div className="animate-pulse text-gray-400">Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -85,7 +127,7 @@ const BottomNavigation = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
-            
+
             return (
               <Link key={item.href} href={item.href} className="flex-1">
                 <motion.div
@@ -127,7 +169,7 @@ const BottomNavigation = () => {
                   >
                     {item.label}
                   </motion.span>
-                  
+
                   {/* Active indicator */}
                   <AnimatePresence>
                     {isActive && (
@@ -150,6 +192,55 @@ const BottomNavigation = () => {
   );
 };
 
+// Auth Button Component for Desktop
+const AuthButton = ({ isMobile = false }: { isMobile?: boolean }) => {
+  const { isAuthenticated, isLoading, user } = useAuthenticationState();
+  const { clearAuthState } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center">
+        <div className="animate-pulse bg-gray-200 rounded-md w-20 h-8"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return (
+      <div className={`flex items-center gap-2 ${isMobile ? 'flex-col w-full' : ''}`}>
+        <UserButton 
+          afterSignOutUrl="/"
+          appearance={{
+            elements: {
+              avatarBox: "w-8 h-8"
+            }
+          }}
+        />
+        {isMobile && (
+          <span className="text-sm text-gray-600">
+            {user?.firstName || user?.emailAddresses?.[0]?.emailAddress}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex items-center gap-2 ${isMobile ? 'flex-col w-full space-y-2' : ''}`}>
+      <Link href="/sign-in">
+        <Button variant={isMobile ? "default" : "ghost"} size="sm">
+          Sign In
+        </Button>
+      </Link>
+      <Link href="/sign-up">
+        <Button variant="outline" size="sm">
+          Sign Up
+        </Button>
+      </Link>
+    </div>
+  );
+};
+
 export default function Navbar() {
   const [scrollY, setScrollY] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -160,6 +251,8 @@ export default function Navbar() {
   const cartState = useCartStore((state) => state.cart);
   const wishlistItems = useWishlistStore((state) => state.items);
   const cartItemCount = getCartItemCount(cart || cartState);
+  
+  // Initialize cart merge
   useCartMerge();
 
   const { data: categories, isLoading: categoriesLoading } = useQuery({
@@ -193,10 +286,10 @@ export default function Navbar() {
   };
 
   // Determine header background based on scroll position
-  const headerBg = scrollY > 50 
-    ? 'bg-white/95 backdrop-blur-lg shadow-md' 
-    : scrollY > 0 
-      ? 'bg-white/80 backdrop-blur-sm' 
+  const headerBg = scrollY > 50
+    ? 'bg-white/95 backdrop-blur-lg shadow-md'
+    : scrollY > 0
+      ? 'bg-white/80 backdrop-blur-sm'
       : 'bg-transparent';
 
   return (
@@ -224,7 +317,7 @@ export default function Navbar() {
             {/* Desktop Navigation */}
             {!isMobile && (
               <NavigationMenu className="hidden md:flex">
-                <NavigationMenuList>
+                <NavigationMenu>
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className="text-gray-900 hover:text-yellow-400 transition-colors duration-200">
                       Categories
@@ -268,15 +361,15 @@ export default function Navbar() {
                       </motion.ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
-                  <NavigationMenuItem>                  
-                    <NavigationMenuLink 
-                      href='/shop' 
+                  <NavigationMenuItem>
+                    <NavigationMenuLink
+                      href="/shop"
                       className={`${navigationMenuTriggerStyle()} transition-colors duration-200 hover:text-yellow-400`}
                     >
                       Shop
                     </NavigationMenuLink>
                   </NavigationMenuItem>
-                </NavigationMenuList>
+                </NavigationMenu>
               </NavigationMenu>
             )}
 
@@ -398,11 +491,7 @@ export default function Navbar() {
                   </Link>
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                  <Link href="/account">
-                    <User className="h-5 w-5 text-gray-900" />
-                  </Link>
-                </motion.div>
+                <AuthButton />
               </div>
 
               {/* Mobile Menu Trigger */}
@@ -458,12 +547,17 @@ export default function Navbar() {
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
-                      <Link 
-                        href="/shop" 
+                      <Link
+                        href="/shop"
                         className="block py-3 text-gray-900 hover:text-yellow-400 transition-colors duration-200 border-t border-gray-200 mt-4"
                       >
                         Shop
                       </Link>
+                      
+                      {/* Mobile Auth Section */}
+                      <div className="border-t border-gray-200 mt-4 pt-4">
+                        <AuthButton isMobile={true} />
+                      </div>
                     </motion.div>
                   </SheetContent>
                 </Sheet>
@@ -475,7 +569,7 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation */}
       <BottomNavigation />
-      
+
       {/* Mobile Bottom Padding */}
       <div className="md:hidden h-20" />
     </>

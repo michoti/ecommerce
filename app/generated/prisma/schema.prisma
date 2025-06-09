@@ -98,6 +98,7 @@ model Product {
   finish           String?
   coverage         String?
   avgRating        Float        @default(0)
+  featured         Boolean      @default(false)
   images           String[]
   variants         Variant[]
   reviews          Review[]

@@ -75,7 +75,7 @@ export default function ProductSection({ title, description, products, type }: P
                   viewport={{ once: true }}
                   className="group relative"
                 >
-                  <Link href={`/products/${product.slug}`} className="block">
+                  <Link href={`/product/${product.slug}`} className="block">
                     <div className="relative overflow-hidden rounded-lg mb-4 aspect-square bg-gray-100">
                       <Image
                         src={product.images[0]}
@@ -119,10 +119,11 @@ export default function ProductSection({ title, description, products, type }: P
                 viewport={{ once: true }}
                 className="group"
               >
-                <Link href={`/products?category=${category.id}`} className="block">
+                <Link href={`/product?category=${category.id}`} className="block">
                   <div className="relative overflow-hidden rounded-lg mb-4 aspect-square bg-gray-100">
                     <Image
-                      src={category.collections[0]?.products[0]?.images[0] || '/api/placeholder/400/400'}
+                      src={'/api/placeholder/400/400'}
+                      // src={category.collections[0]?.products[0]?.images[0] || '/api/placeholder/400/400'}
                       alt={category.name}
                       width={400}
                       height={400}
@@ -142,10 +143,10 @@ export default function ProductSection({ title, description, products, type }: P
 
         <div className="mt-12 text-center">
           <Link
-            href={isProducts ? '/products' : '/products'}
+            href={isProducts ? '/shop' : '/shop'}
             className="inline-flex items-center gap-2 text-[#4d0000] hover:text-[#ff4d4d] font-medium"
           >
-            View All {isProducts ? 'Products' : 'Categories'} <ArrowRight size={16} />
+            View All { isProducts ? 'Products' : 'Categories' } <ArrowRight size={16} />
           </Link>
         </div>
       </div>

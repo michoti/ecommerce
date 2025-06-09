@@ -166,6 +166,7 @@ exports.Prisma.ProductScalarFieldEnum = {
   finish: 'finish',
   coverage: 'coverage',
   avgRating: 'avgRating',
+  featured: 'featured',
   images: 'images',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

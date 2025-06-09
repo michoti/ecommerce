@@ -7848,6 +7848,7 @@ export namespace Prisma {
     finish: string | null
     coverage: string | null
     avgRating: number | null
+    featured: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7861,6 +7862,7 @@ export namespace Prisma {
     finish: string | null
     coverage: string | null
     avgRating: number | null
+    featured: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7874,6 +7876,7 @@ export namespace Prisma {
     finish: number
     coverage: number
     avgRating: number
+    featured: number
     images: number
     createdAt: number
     updatedAt: number
@@ -7898,6 +7901,7 @@ export namespace Prisma {
     finish?: true
     coverage?: true
     avgRating?: true
+    featured?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7911,6 +7915,7 @@ export namespace Prisma {
     finish?: true
     coverage?: true
     avgRating?: true
+    featured?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7924,6 +7929,7 @@ export namespace Prisma {
     finish?: true
     coverage?: true
     avgRating?: true
+    featured?: true
     images?: true
     createdAt?: true
     updatedAt?: true
@@ -8025,6 +8031,7 @@ export namespace Prisma {
     finish: string | null
     coverage: string | null
     avgRating: number
+    featured: boolean
     images: string[]
     createdAt: Date
     updatedAt: Date
@@ -8058,6 +8065,7 @@ export namespace Prisma {
     finish?: boolean
     coverage?: boolean
     avgRating?: boolean
+    featured?: boolean
     images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8077,6 +8085,7 @@ export namespace Prisma {
     finish?: boolean
     coverage?: boolean
     avgRating?: boolean
+    featured?: boolean
     images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8091,6 +8100,7 @@ export namespace Prisma {
     finish?: boolean
     coverage?: boolean
     avgRating?: boolean
+    featured?: boolean
     images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8105,12 +8115,13 @@ export namespace Prisma {
     finish?: boolean
     coverage?: boolean
     avgRating?: boolean
+    featured?: boolean
     images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "shortDescription" | "longDescription" | "finish" | "coverage" | "avgRating" | "images" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "slug" | "shortDescription" | "longDescription" | "finish" | "coverage" | "avgRating" | "featured" | "images" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     variants?: boolean | Product$variantsArgs<ExtArgs>
     reviews?: boolean | Product$reviewsArgs<ExtArgs>
@@ -8138,6 +8149,7 @@ export namespace Prisma {
       finish: string | null
       coverage: string | null
       avgRating: number
+      featured: boolean
       images: string[]
       createdAt: Date
       updatedAt: Date
@@ -8576,6 +8588,7 @@ export namespace Prisma {
     readonly finish: FieldRef<"Product", 'String'>
     readonly coverage: FieldRef<"Product", 'String'>
     readonly avgRating: FieldRef<"Product", 'Float'>
+    readonly featured: FieldRef<"Product", 'Boolean'>
     readonly images: FieldRef<"Product", 'String[]'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
@@ -17495,6 +17508,7 @@ export namespace Prisma {
     finish: 'finish',
     coverage: 'coverage',
     avgRating: 'avgRating',
+    featured: 'featured',
     images: 'images',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -17704,6 +17718,13 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -18072,6 +18093,7 @@ export namespace Prisma {
     finish?: StringNullableFilter<"Product"> | string | null
     coverage?: StringNullableFilter<"Product"> | string | null
     avgRating?: FloatFilter<"Product"> | number
+    featured?: BoolFilter<"Product"> | boolean
     images?: StringNullableListFilter<"Product">
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -18090,6 +18112,7 @@ export namespace Prisma {
     finish?: SortOrderInput | SortOrder
     coverage?: SortOrderInput | SortOrder
     avgRating?: SortOrder
+    featured?: SortOrder
     images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -18111,6 +18134,7 @@ export namespace Prisma {
     finish?: StringNullableFilter<"Product"> | string | null
     coverage?: StringNullableFilter<"Product"> | string | null
     avgRating?: FloatFilter<"Product"> | number
+    featured?: BoolFilter<"Product"> | boolean
     images?: StringNullableListFilter<"Product">
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -18129,6 +18153,7 @@ export namespace Prisma {
     finish?: SortOrderInput | SortOrder
     coverage?: SortOrderInput | SortOrder
     avgRating?: SortOrder
+    featured?: SortOrder
     images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -18151,6 +18176,7 @@ export namespace Prisma {
     finish?: StringNullableWithAggregatesFilter<"Product"> | string | null
     coverage?: StringNullableWithAggregatesFilter<"Product"> | string | null
     avgRating?: FloatWithAggregatesFilter<"Product"> | number
+    featured?: BoolWithAggregatesFilter<"Product"> | boolean
     images?: StringNullableListFilter<"Product">
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -19077,6 +19103,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19095,6 +19122,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19113,6 +19141,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19131,6 +19160,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19149,6 +19179,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19163,6 +19194,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19177,6 +19209,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20198,6 +20231,11 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type StringNullableListFilter<$PrismaModel = never> = {
     equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     has?: string | StringFieldRefInput<$PrismaModel> | null
@@ -20250,6 +20288,7 @@ export namespace Prisma {
     finish?: SortOrder
     coverage?: SortOrder
     avgRating?: SortOrder
+    featured?: SortOrder
     images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20268,6 +20307,7 @@ export namespace Prisma {
     finish?: SortOrder
     coverage?: SortOrder
     avgRating?: SortOrder
+    featured?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -20281,6 +20321,7 @@ export namespace Prisma {
     finish?: SortOrder
     coverage?: SortOrder
     avgRating?: SortOrder
+    featured?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -20321,6 +20362,14 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -21273,6 +21322,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type ProductUpdateimagesInput = {
     set?: string[]
     push?: string | string[]
@@ -21890,6 +21943,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -21932,6 +21990,14 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedDecimalFilter<$PrismaModel = never> = {
@@ -22654,6 +22720,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22671,6 +22738,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22731,6 +22799,7 @@ export namespace Prisma {
     finish?: StringNullableFilter<"Product"> | string | null
     coverage?: StringNullableFilter<"Product"> | string | null
     avgRating?: FloatFilter<"Product"> | number
+    featured?: BoolFilter<"Product"> | boolean
     images?: StringNullableListFilter<"Product">
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
@@ -22991,6 +23060,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23008,6 +23078,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23097,6 +23168,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23114,6 +23186,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23163,6 +23236,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23180,6 +23254,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23213,6 +23288,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23230,6 +23306,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23554,6 +23631,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23571,6 +23649,7 @@ export namespace Prisma {
     finish?: string | null
     coverage?: string | null
     avgRating?: number
+    featured?: boolean
     images?: ProductCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23682,6 +23761,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23699,6 +23779,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24271,6 +24352,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24288,6 +24370,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24305,6 +24388,7 @@ export namespace Prisma {
     finish?: NullableStringFieldUpdateOperationsInput | string | null
     coverage?: NullableStringFieldUpdateOperationsInput | string | null
     avgRating?: FloatFieldUpdateOperationsInput | number
+    featured?: BoolFieldUpdateOperationsInput | boolean
     images?: ProductUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

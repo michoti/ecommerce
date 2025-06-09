@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { useCartMerge } from '@/lib/modules/cart/useCartMerge';
 import { useCartStore } from '@/lib/modules/cart/cart.store';
 import { Separator } from '@/components/ui/separator';
+import { Variant } from '@/lib/modules/cart/cart.types';
 
 const CartPage = () => {
   // const { userId } = useAuth();
@@ -34,12 +35,12 @@ const CartPage = () => {
   const estimatedTotal = subtotal;
 
   const updateQuantity = async (cartItemId: string, variantId: string, newQuantity: number) => {
+    console.log("this is my variantId", variantId)
     if (newQuantity < 1) return;
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(variantId)}`);
+      const response = await fetch(`/api/variant/${variantId}`);
       if (!response.ok) throw new Error('Failed to fetch variant');
-      const { results } = await response.json();
-      const variant = results[0]?.variants.find(v => v.id === variantId);
+       const variant: Variant = await response.json();
       if (!variant) throw new Error('Variant not found');
       if (newQuantity > variant.stock) {
         toast.error(`Insufficient stock: ${newQuantity} requested, ${variant.stock} available`);
@@ -62,7 +63,7 @@ const CartPage = () => {
       if (userId) {
         await removeItemMutation.mutateAsync(cartItemId);
       } else {
-        await useCartStore.getState().deleteItem(cartItemId);
+        await useCartStore.getState().removeItem(cartItemId);
       }
       toast.success('Item removed');
     } catch (err) {
@@ -149,7 +150,7 @@ const CartPage = () => {
                               </div>
                             </div>
                             <div className="md:col-span-2 text-right">
-                              <p className="text-lg font-medium text-gray-900">${item.variant.price.toFixed(2)}</p>
+                              <p className="text-lg font-medium text-gray-900">${item.variant.price}</p>
                             </div>
                             <div className="md:col-span-2 flex justify-center">
                               <div className="flex items-center border border-gray-200 rounded-md">

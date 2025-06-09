@@ -29,7 +29,7 @@ const ProductCard: FC<ProductCardProps> = ({ product, index }) => {
   // Handle click to navigate to product details using slug
   const handleClick = () => {
     console.log("### slug before product click :", product);
-    router.push(`/products/${product.slug}`);
+    router.push(`/product/${product.slug}`);
   };
 
   return (

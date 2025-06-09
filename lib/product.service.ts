@@ -1,6 +1,6 @@
 import db from '@/lib/prismadb';
-import { Product, Variant } from '@/lib/modules/types';
 import Decimal from 'decimal.js';
+import { Product, Variant } from './modules/cart/cart.types';
 
 export const getVariantById = async (variantId: string): Promise<Variant | null> => {
   try {

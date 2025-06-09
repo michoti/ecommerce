@@ -58,6 +58,7 @@ export interface Product {
   finish?: string;
   coverage?: string;
   avgRating: number;
+  featured: boolean;
   images: string[];
   variants: Variant[];
   reviews: Array<{
@@ -87,5 +88,11 @@ export interface Category {
 export interface SearchResponse {
   results: Product[];
   count: number;
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
   lastUpdated: string;
 }

@@ -1,172 +1,188 @@
 "use client";
 
-import * as Clerk from "@clerk/elements/common";
-import * as SignUp from "@clerk/elements/sign-up";
-import { useUser } from "@clerk/nextjs";
-import { login, logout } from "@/lib/features/authSlice";
-import { AppDispatch, useAppSelector } from "@/lib/store";
-import { useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import AuthLayout from "@/components/AuthLayout";
+// import * as Clerk from "@clerk/elements/common";
+// import * as SignUp from "@clerk/elements/sign-up";
 import Link from "next/link";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Chrome } from "lucide-react";
+import { Chrome, Eye, EyeOff } from "lucide-react";
+import AuthLayout from "@/components/AuthLayout";
+import { useState } from "react";
+import { SignUp } from "@clerk/nextjs";
 
 const SignUpPage = () => {
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
-  const authStatus = useAppSelector((state) => state.auth.status);
-  const [loading, setLoading] = useState(true);
-  const { isSignedIn, user, isLoaded } = useUser();
+  const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (isSignedIn && user) {
-      dispatch(
-        login({
-          $id: user.id,
-          email: user.emailAddresses[0].emailAddress,
-          firstName: user.firstName || undefined,
-        })
-      );
-      router.push("/products");
-    } else {
-      dispatch(logout());
-    }
-    setLoading(false);
-  }, [isSignedIn, user, isLoaded, dispatch, router]);
+  const inputClassName = "w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 transition-colors";
+  
+  const buttonClassName = "relative flex justify-center items-center h-12 w-full text-sm font-medium tracking-tight overflow-hidden rounded-md bg-neutral-900 px-4 py-2.5 text-white transition-all duration-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <AuthLayout authentication={false}>
-      {loading || !isLoaded ? (
-        <div className="flex py-16 items-center justify-center px-4">
-          <p>Loading...</p>
-        </div>
-      ) : isSignedIn && authStatus ? (
-        <div className="flex py-16 items-center justify-center px-4">
-          <div className="mx-auto text-gray-700 w-full max-w-[500px]">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-normal font-geist tracking-tighter">
-                Welcome aboard
-              </h1>
-              <p className="text-gray-800/90">
-                Your account has been created successfully
-              </p>
-              <Link href="/products">
-                <button className="mt-6 relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2">
-                  Start Shopping
-                </button>
-              </Link>
-            </div>
+      <div className="flex min-h-screen py-16 relative items-center justify-center px-4">
+        <div className="mx-auto z-10 w-full max-w-md">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+              Create your account
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Sign up to start your shopping journey
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="flex py-16 relative items-center justify-center px-4">
-          <div className="mx-auto z-10 text-gray-700 w-full max-w-[500px]">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-normal font-geist tracking-tighter">
-                Create an account
-              </h1>
-              <p className="text-gray-800/90 font-geist font-normal">
-                Sign up to start shopping
-              </p>
-            </div>
-
-            <SignUp.Root>
-              {/* Sign-up Form */}
-              <SignUp.Step name="start">
-                <div className="space-y-5">
-                  <Clerk.Field name="emailAddress">
-                    <Label htmlFor="emailAddress">Email</Label>
-                    <Clerk.Input
-                      className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                      placeholder="Enter your email"
-                    />
-                    <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                  </Clerk.Field>
-
-                  <Clerk.Field name="username">
-                    <Label htmlFor="firstName">Username</Label>
-                    <Clerk.Input
-                      className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                      placeholder="Enter your username"
-                    />
-                    <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                  </Clerk.Field>
-
-                  <Clerk.Field name="password">
-                    <Label htmlFor="password">Password</Label>
-                    <Clerk.Input
-                      className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                      placeholder="Create a password"
-                    />
-                    <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                  </Clerk.Field>
-
-                  <SignUp.Captcha />
-
-                  <SignUp.Action
-                    submit
-                    className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                  >
-                    Sign up
-                  </SignUp.Action>
-                </div>
-              </SignUp.Step>
-
-              {/* Verification Step */}
-              <SignUp.Step name="verifications">
-                <SignUp.Strategy name="email_code">
-                  <div className="space-y-5">
-                    <p className="text-sm text-gray-600">
-                      We sent a code to your email.
-                    </p>
-                    <Clerk.Field name="code">
-                      <Label htmlFor="code">Verification Code</Label>
-                      <Clerk.Input
-                        className="w-full rounded border border-gray-300 px-3 py-2 text-black placeholder:text-gray-400"
-                        placeholder="Enter verification code"
-                      />
-                      <Clerk.FieldError className="text-red-500 text-sm mt-1" />
-                    </Clerk.Field>
-                    <SignUp.Action
-                      submit
-                      className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
-                    >
-                      Verify
-                    </SignUp.Action>
-                  </div>
-                </SignUp.Strategy>
-              </SignUp.Step>
-            </SignUp.Root>
-
-            {/* Google Sign-up and Sign-in Link */}
-            <div className="mt-6 text-center text-sm">
-              <p className="text-gray-500">
-                Already have an account?
-                <Link
-                  className="font-medium text-gray-900 underline-offset-4 hover:underline ml-2"
-                  href="/sign-in"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-            <div className="mt-6 border-t pt-6">
+          <SignUp />
+{/* 
+          <SignUp.Root>
+            <SignUp.Step name="start">
               <Clerk.Connection
                 name="google"
-                className="relative flex justify-center items-center h-12 w-full mx-auto text-center font-geist tracking-tighter overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2"
+                className="relative flex justify-center items-center h-12 w-full text-sm font-medium tracking-tight overflow-hidden rounded-md border border-gray-300 bg-white px-4 py-2.5 text-gray-700 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2"
               >
-                <Chrome className="text-white mr-2 h-4 w-4" />
-                Sign up with Google
+                <Chrome className="mr-2 h-4 w-4" />
+                Continue with Google
               </Clerk.Connection>
+
+             
+              <div className="mt-8 mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+             
+                <Clerk.Field name="emailAddress" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    Email address
+                  </Clerk.Label>
+                  <Clerk.Input
+                    type="email"
+                    autoComplete="email"
+                    className={inputClassName}
+                    placeholder="Enter your email address"
+                  />
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+             
+                <Clerk.Field name="username" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    Username
+                  </Clerk.Label>
+                  <Clerk.Input
+                    type="text"
+                    autoComplete="username"
+                    className={inputClassName}
+                    placeholder="Choose a username"
+                  />
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+            
+                <Clerk.Field name="password" className="space-y-2">
+                  <Clerk.Label className="text-sm font-medium text-gray-700">
+                    Password
+                  </Clerk.Label>
+                  <div className="relative">
+                    <Clerk.Input
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className={`${inputClassName} pr-10`}
+                      placeholder="Create a secure password"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                </Clerk.Field>
+
+             
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>Password must contain:</p>
+                  <ul className="ml-4 space-y-0.5">
+                    <li>• At least 8 characters</li>
+                    <li>• One uppercase and lowercase letter</li>
+                    <li>• One number or special character</li>
+                  </ul>
+                </div>
+
+              
+                <SignUp.Captcha className="flex justify-center" />
+
+            
+                <SignUp.Action submit className={buttonClassName}>
+                  Create account
+                </SignUp.Action>
+              </div>
+            </SignUp.Step>
+
+           
+            <SignUp.Step name="verifications">
+              <SignUp.Strategy name="email_code">
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                      Verify your email
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      We've sent a verification code to your email address. Please enter it below to complete your registration.
+                    </p>
+                  </div>
+                  
+                  <Clerk.Field name="code" className="space-y-2">
+                    <Clerk.Label className="text-sm font-medium text-gray-700">
+                      Verification code
+                    </Clerk.Label>
+                    <Clerk.Input
+                      type="text"
+                      autoComplete="one-time-code"
+                      className={inputClassName}
+                      placeholder="Enter 6-digit code"
+                      maxLength={6}
+                    />
+                    <Clerk.FieldError className="text-red-600 text-xs mt-1 block" />
+                  </Clerk.Field>
+                  
+                  <SignUp.Action submit className={buttonClassName}>
+                    Verify email
+                  </SignUp.Action>
+
+                
+                  <div className="text-center">
+                    <SignUp.Action
+                      resend
+                      className="text-sm text-gray-600 hover:text-gray-900 underline-offset-4 hover:underline focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 rounded"
+                    >
+                      Didn't receive the code? Resend
+                    </SignUp.Action>
+                  </div>
+                </div>
+              </SignUp.Strategy>
+            </SignUp.Step>
+
+          
+            <div className="mt-6 text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link href="/sign-in" className="font-medium text-neutral-900 hover:underline">
+                Sign in
+              </Link>
             </div>
-          </div>
+          </SignUp.Root> */}
         </div>
-      )}
+      </div>
     </AuthLayout>
   );
 };

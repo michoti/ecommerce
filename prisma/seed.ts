@@ -54,6 +54,7 @@ async function main() {
       longDescription: 'The Classic Matte Lip offers a rich, velvety finish that stays put for hours. Its highly pigmented formula provides full coverage in a single swipe, perfect for day-to-night wear. Infused with moisturizing ingredients to keep lips comfortable without compromising on staying power.',
       finish: 'Matte',
       avgRating: 4.25,
+      featured: true,
       images: [
         '/products/lipstick-1-front.jpg',
         '/products/lipstick-1-angle.jpg',
@@ -96,6 +97,7 @@ async function main() {
       longDescription: 'The Satin Lip Color delivers a luxurious, semi-glossy finish with a creamy texture. Designed for comfort and elegance, this lipstick glides on effortlessly, offering medium coverage with buildable intensity. Ideal for those seeking a sophisticated, polished look.',
       finish: 'Satin',
       avgRating: 4.5,
+      featured: false,
       images: [
         '/products/lipstick-2-front.jpg',
         '/products/lipstick-2-angle.jpg',
@@ -138,6 +140,7 @@ async function main() {
       longDescription: 'Lip Gloss Luxe provides a mirror-like shine with a lightweight, non-sticky feel. Enriched with hydrating ingredients, it keeps lips soft and glossy for hours. Perfect for a bold, glamorous look or layered over lipstick for added dimension.',
       finish: 'Glossy',
       avgRating: 4.5,
+      featured: false,
       images: [
         '/products/gloss-1-front.jpg',
         '/products/gloss-1-angle.jpg',
@@ -180,6 +183,7 @@ async function main() {
       longDescription: 'The Hydrating Lip Tint offers a sheer wash of color with a natural, dewy finish. Infused with nourishing oils, it hydrates lips while providing a subtle, buildable tint. Perfect for a low-maintenance, fresh look.',
       finish: 'Natural',
       avgRating: 4.2,
+      featured: true,
       images: [
         '/products/tint-1-front.jpg',
         '/products/tint-1-angle.jpg',
@@ -222,6 +226,7 @@ async function main() {
       longDescription: 'The Satin Finish Foundation provides medium, buildable coverage with a natural, radiant look. Its lightweight formula blends seamlessly, offering all-day wear with a comfortable, breathable feel. Suitable for all skin types.',
       coverage: 'Medium',
       avgRating: 4.35,
+      featured: false,
       images: [
         '/products/foundation-1-front.jpg',
         '/products/foundation-1-angle.jpg',
@@ -264,6 +269,7 @@ async function main() {
       longDescription: 'The Velvet Cream Blush melts into the skin for a seamless, radiant flush. Its blendable cream formula offers a natural, dewy finish that lasts all day. Perfect for cheeks and lips for a cohesive look.',
       finish: 'Cream',
       avgRating: 4.55,
+      featured: false,
       images: [
         '/products/blush-1-front.jpg',
         '/products/blush-1-angle.jpg',
@@ -306,6 +312,7 @@ async function main() {
       longDescription: 'The Multi-Stick Blush is a versatile, creamy formula designed for use on cheeks, lips, and even eyes. Its portable stick format makes application effortless, delivering a natural flush with a smooth, blendable texture.',
       finish: 'Cream',
       avgRating: 4.25,
+      featured: false,
       images: [
         '/products/blush-2-front.jpg',
         '/products/blush-2-angle.jpg',
@@ -348,6 +355,7 @@ async function main() {
       longDescription: 'The Dewy Highlighter adds a radiant, luminous glow to your complexion. Its silky formula blends effortlessly, providing a natural shimmer that catches the light beautifully. Perfect for highlighting cheekbones, brow bones, and more.',
       finish: 'Dewy',
       avgRating: 4.65,
+      featured: true,
       images: [
         '/products/highlighter-1-front.jpg',
         '/products/highlighter-1-angle.jpg',
@@ -389,6 +397,7 @@ async function main() {
       shortDescription: 'Timeless fragrance with floral and woody notes.',
       longDescription: 'Perfume Classic is a sophisticated blend of floral, citrus, and woody notes, creating a timeless scent for any occasion. Its long-lasting formula ensures you stay fresh from day to night, perfect for those who love elegance and versatility.',
       avgRating: 4.45,
+      featured: false,
       images: [
         '/products/perfume-1-front.jpg',
         '/products/perfume-1-angle.jpg',
