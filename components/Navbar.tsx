@@ -103,17 +103,17 @@ const BottomNavigation = () => {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-        <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
-          <div className="flex items-center justify-center px-4 py-4">
-            <div className="animate-pulse text-gray-400">Loading...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+  //       <div className="bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+  //         <div className="flex items-center justify-center px-4 py-4">
+  //           <div className="animate-pulse text-gray-400">Loading...</div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <motion.div

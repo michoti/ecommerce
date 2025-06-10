@@ -7,6 +7,7 @@ export async function POST(request: Request) {
   try {
     
     const { userId } = await auth();
+    
     if (!userId) {
       return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
     }

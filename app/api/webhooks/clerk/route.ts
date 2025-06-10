@@ -113,9 +113,7 @@ export async function POST(request: Request) {
           );
         }
 
-        // Delete user from database
-        // Note: This will cascade delete related records (carts, orders, etc.)
-        // based on your Prisma schema relationships
+       
         await db.user.delete({
           where: { id },
         });

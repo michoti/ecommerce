@@ -48,6 +48,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
+    "resend": "^4.5.2",
     "sonner": "^2.0.3",
     "svix": "^1.67.0",
     "tailwind-merge": "^3.3.0",

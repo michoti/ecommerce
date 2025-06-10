@@ -18,6 +18,7 @@ import { useAuth } from '@clerk/nextjs';
 import { calculateCartTotal, getCartItemCount } from '@/lib/modules/cart/cart.utils';
 import { useCartStore } from '@/lib/modules/cart/cart.store';
 import { useWishlistStore } from '@/lib/modules/wishlist/wishlist.store';
+import ProductReviews from '@/components/ProductReviews';
 
 const fetchProductBySlug = async (slug: string): Promise<Product | null> => {
   const response = await fetch(`/api/search?slug=${encodeURIComponent(slug)}`);
@@ -28,8 +29,7 @@ const fetchProductBySlug = async (slug: string): Promise<Product | null> => {
 
 const ProductPage = () => {
   const { slug } = useParams() as { slug: string };
-  // const { userId } = useAuth();
-  const userId = null;
+  const { userId } = useAuth();
   const { data: product, error, isLoading } = useQuery({
     queryKey: ['product', slug],
     queryFn: () => fetchProductBySlug(slug),
@@ -366,42 +366,8 @@ const ProductPage = () => {
           </motion.div>
         </div>
 
-        <motion.div
-          className="mt-12"
-          initial={{ opacity: "0", y: "50" }}
-          animate={{ opacity: "1", y: "0" }}
-          transition={{ duration: "0.6", delay: 0.4 }}
-        >
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
-          {product.reviews.length > 0 ? (
-            <div className="space-y-4">
-              {product.reviews.map((review) => (
-                <Card key={review.id} className="p-4 bg-white rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${i < Math.round(review.rating) ? 'fill-current' : ''}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-gray-600">{review.rating.toFixed(1)}</span>
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      {new Date(review.date).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 leading-tight">{review.comment}</p>
-                  <p className="text-sm text-gray-600 mt-2">— {review.reviewer}</p>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600">No reviews yet.</p>
-          )}
-        </motion.div>
+        <ProductReviews reviews={product.reviews} productId={product.id} />
+
       </div>
       </div>
     );
