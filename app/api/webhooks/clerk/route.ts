@@ -3,8 +3,9 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import db from '@/lib/prismadb';
 import type { WebhookEvent } from '@clerk/nextjs/server';
+import { env } from "@/env.mjs"
 
-const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 
 if (!WEBHOOK_SECRET) {
   throw new Error('CLERK_WEBHOOK_SECRET is not set in .env');

@@ -28,7 +28,7 @@ const SignUpPage = () => {
               Sign up to start your shopping journey
             </p>
           </div>
-          <SignUp />
+          {/* <SignUp /> */}
 {/* 
           <SignUp.Root>
             <SignUp.Step name="start">

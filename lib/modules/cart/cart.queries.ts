@@ -101,7 +101,7 @@ const mergeCart = async (userId: string, items: CartItemInput[]): Promise<Cart> 
 };
 
 export const useCartQuery = () => {
-   const { userId } = useAuth();
+  const { userId } = useAuth();
   // const userId = null;
   return useQuery<Cart | null, Error>({
     queryKey: ['cart', userId],
@@ -202,7 +202,7 @@ export const useUpdateCartItemMutation = () => {
 
 export const useRemoveCartItemMutation = () => {
    const { userId } = useAuth();
-  // const userId = null;
+   // const userId = null;
   const queryClient = useQueryClient();
   return useMutation<Cart, Error, { cartId: string; cartItemId: string }>({
     mutationFn: ({ cartId, cartItemId }) => removeCartItem(userId, cartId, cartItemId),
@@ -241,8 +241,8 @@ export const useRemoveCartItemMutation = () => {
 };
 
 export const useMergeCartMutation = () => {
-   const { userId } = useAuth();
-   // const userId = null;
+  const { userId } = useAuth();
+  // const userId = null;
   const queryClient = useQueryClient();
   return useMutation<Cart, Error, CartItemInput[]>({
     mutationFn: (items) => mergeCart(userId!, items),

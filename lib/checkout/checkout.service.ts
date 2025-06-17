@@ -42,7 +42,7 @@ export const useCheckout = () => {
       const result = await createOrderMutation.mutateAsync(orderData);
 
       // Send confirmation email
-      await sendOrderConfirmationEmail(result.order);
+      // await sendOrderConfirmationEmail(result.order);
 
       // Reset checkout state
       reset();

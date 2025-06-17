@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CheckoutState, ShippingMethod, PaymentMethod, OrderItem, ShippingAddress, BillingAddress } from './types';
+import { CheckoutState, ShippingMethod, PaymentMethod, OrderItem, ShippingAddress, BillingAddress, ShippingMethodSchema, PaymentMethodSchema } from './types';
 
 interface CheckoutStore {
   checkout: CheckoutState;
@@ -18,8 +18,8 @@ export const useCheckoutStore = create<CheckoutStore>((set) => ({
   checkout: {
     shippingAddress: {},
     billingAddress: {},
-    shippingMethod: ShippingMethod.STANDARD,
-    paymentMethod: PaymentMethod.CREDIT_CARD,
+    shippingMethod: ShippingMethodSchema.Values.STANDARD,
+    paymentMethod: PaymentMethodSchema.Values.CREDIT_CARD,
     orderItems: [],
   },
   setShippingAddress: (address) =>

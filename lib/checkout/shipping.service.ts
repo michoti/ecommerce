@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ShippingAddress, BillingAddress } from './types';
 
-const fetchShippingAddresses = async (userId?: string): Promise<ShippingAddress[]> => {
-  const response = await fetch(userId ? `/api/shipping-addresses?userId=${userId}` : '/api/shipping-addresses');
+const fetchShippingAddresses = async (): Promise<ShippingAddress[]> => {
+  const response = await fetch('/api/shipping-addresses');
   if (!response.ok) throw new Error('Failed to fetch shipping addresses');
   return response.json();
 };
@@ -27,10 +27,10 @@ const createBillingAddress = async (address: Partial<BillingAddress>): Promise<B
   return response.json();
 };
 
-export const useShippingAddressesQuery = (userId?: string) =>
+export const useShippingAddressesQuery = () =>
   useQuery({
-    queryKey: ['shippingAddresses', userId],
-    queryFn: () => fetchShippingAddresses(userId),
+    queryKey: ['shippingAddresses'],
+    queryFn: () => fetchShippingAddresses,
   });
 
 export const useCreateShippingAddressMutation = () =>

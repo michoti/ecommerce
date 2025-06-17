@@ -30,7 +30,7 @@ const SignInPage = () => {
               Sign in to your account to continue
             </p>
           </div>
-          <SignIn />
+          {/* <SignIn /> */}
 
           {/* <SignIn.Root> */}
           

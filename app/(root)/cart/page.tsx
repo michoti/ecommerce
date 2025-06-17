@@ -16,10 +16,11 @@ import { useCartMerge } from '@/lib/modules/cart/useCartMerge';
 import { useCartStore } from '@/lib/modules/cart/cart.store';
 import { Separator } from '@/components/ui/separator';
 import { Variant } from '@/lib/modules/cart/cart.types';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
-  // const { userId } = useAuth();
-  const userId = null;
+  const router = useRouter();
+  const { userId } = useAuth();
   useCartMerge();
   const { data: serverCart } = useCartQuery();
   const cartState = useCartStore((state) => state.cart);
@@ -81,10 +82,11 @@ const CartPage = () => {
   const handleCheckout = () => {
     if (!userId) {
       toast.error('Please sign in to proceed to checkout');
-      window.location.href = '/sign-in';
+      //window.location.href = '/sign-in';
+      router.push('/sign-in');
       return;
     }
-    toast.info('Proceeding to checkout...');
+    router.push('/checkout');
   };
 
   const containerVariants = {

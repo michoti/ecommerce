@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 export const useCartMerge = () => {
   const { userId } = useAuth();
+  // const userId = null;
   const mergeCartMutation = useMergeCartMutation();
   const cart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);

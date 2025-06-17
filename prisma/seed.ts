@@ -228,7 +228,7 @@ async function main() {
       avgRating: 4.35,
       featured: false,
       images: [
-        '/products/foundation-1-front.jpg',
+        '/products/foundation-1-front.jpeg',
         '/products/foundation-1-angle.jpg',
         '/products/foundation-1-swatches.jpg',
         '/products/foundation-1-packaging.jpg'
@@ -400,7 +400,7 @@ async function main() {
       featured: false,
       images: [
         '/products/perfume-1-front.jpg',
-        '/products/perfume-1-angle.jpg',
+        '/products/perfume-1-angle.png',
         '/products/perfume-1-bottle.jpg',
         '/products/perfume-1-packaging.jpg'
       ],
