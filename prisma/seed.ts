@@ -226,7 +226,7 @@ async function main() {
       longDescription: 'The Satin Finish Foundation provides medium, buildable coverage with a natural, radiant look. Its lightweight formula blends seamlessly, offering all-day wear with a comfortable, breathable feel. Suitable for all skin types.',
       coverage: 'Medium',
       avgRating: 4.35,
-      featured: false,
+      featured: true,
       images: [
         '/products/foundation-1-front.jpeg',
         '/products/foundation-1-angle.jpg',

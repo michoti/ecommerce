@@ -17,3 +17,4 @@
 - [x] create user account page (user should be able to see order history, track shipping)
 - [] implement production database (use Neon)
 - [] store clerk user username in db
+- [] add image for category

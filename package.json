@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "next lint",
     "ngrok:start": "ngrok http http://localhost:3000",
-    "prisma:seed": "npx prisma db seed"
+    "db:seed": "npx prisma db seed",
+    "db:migrate": "npx prisma migrate dev --name effect_changes",
+    "db:push": "npx prisma migrate reset && npm run db:migrate"
   },
   "dependencies": {
     "@clerk/elements": "^0.23.31",
