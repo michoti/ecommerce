@@ -47,8 +47,8 @@ export const useCheckoutStore = create<CheckoutStore>((set) => ({
       checkout: {
         shippingAddress: {},
         billingAddress: {},
-        shippingMethod: ShippingMethod.STANDARD,
-        paymentMethod: PaymentMethod.CREDIT_CARD,
+        shippingMethod: "STANDARD",
+        paymentMethod: "CREDIT_CARD",
         orderItems: [],
       },
     }),
